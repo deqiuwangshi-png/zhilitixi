@@ -37,6 +37,14 @@ export interface ReportListQuery {
 /** 分页结果通用结构 */
 export interface ReportPageResult<T> {
   rows: T[];
+  /**
+   * 记录总数（口径随 repeat 筛选变化）：
+   * - 未开启 repeat：数据库 `count:'exact'` 的 status/type/reason/q 过滤口径。
+   * - 开启 repeat：切换为「当前筛选条件（status/type/reason/q，同时不含 range）下，
+   *   按 target_id 分组、count(*)>=2 判定为重复目标」的举报记录总数。由 queries 内对该
+   *   同条件目标集合做一次聚合得出，与返回行数（重复目标举报记录）口径一致，保证
+   *   totalPages 与实际数据不夸大、不截断。
+   */
   total: number;
   page: number;
   pageSize: number;

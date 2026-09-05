@@ -1,5 +1,6 @@
 // 用户认证仓储层：认证申请列表（联表用户名）+ 审核写操作。
 import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
+import { getSessionRlsClient } from '@/lib/auth/session-client';
 
 export type VerificationStatus = 'pending' | 'approved' | 'rejected';
 
@@ -20,9 +21,16 @@ export interface AuthData {
 
 /** 认证申请列表 + 注册用户总数 */
 export async function listAuthData(): Promise<AuthData> {
-  const client = getSupabasePrivilegedClient();
+  // 读取走 RLS 用户客户端（当前请求管理员 token；verifications_admin / users_select_admin 策略放行），
+  // service-role 仅保留写路径。
+  const client = await getSessionRlsClient();
   const [{ data: verifications }, { count: totalUsers }] = await Promise.all([
-    client.from('verifications').select('*').order('created_at', { ascending: false }).limit(200),
+    // 认证申请预览上限（分页下沉见 modules/user-auth / 后续演进）
+    client
+      .from('verifications')
+      .select('id,user_id,vtype,statement,status,created_at')
+      .order('created_at', { ascending: false })
+      .limit(200),
     client.from('users').select('id', { count: 'exact', head: true }),
   ]);
   const rows = verifications ?? [];

@@ -6,7 +6,7 @@
 // 合并行内切片”，根治丢行 / 截断 / 失序。
 // 说明：q 由原来的“标题或作者”扩展为视图归一化 search_text（含标题/摘要/内容/作者名）——
 // 下沉到数据库后必须以归一化列检索，检索面略宽但语义等价、total 口径一致。
-import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
+import { getSessionRlsClient } from '@/lib/auth/session-client';
 import { discoveryRowToItem, squareRowToItem, urlRowToItem, type RowContext } from './content-review.mapper';
 import { DEFAULT_PAGE_SIZE, SIZES } from './content-review.schema';
 import type {
@@ -85,7 +85,9 @@ export async function listContent(query: ReviewListQuery): Promise<ReviewPageRes
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  const client = getSupabasePrivilegedClient();
+  // 读取走 RLS 用户客户端（当前请求管理员 token）；union 视图 011 已切 security_invoker，
+  // 底层 url_audit 等表的 admin 读策略照常生效，service-role 仅保留写路径。
+  const client = await getSessionRlsClient();
   let builder = client
     .from('v_content_review_catalog')
     .select('*', { count: 'exact' })
@@ -127,7 +129,7 @@ export async function listContent(query: ReviewListQuery): Promise<ReviewPageRes
 
 /** 全部分类候选（去重，供筛选下拉）；三表有界拉取代价较低的投影列 */
 export async function listCategories(): Promise<string[]> {
-  const client = getSupabasePrivilegedClient();
+  const client = await getSessionRlsClient();
   const [dd, ss, uu] = await Promise.all([
     client.from('discoveries').select('type').limit(200),
     client.from('square_posts').select('category').limit(200),

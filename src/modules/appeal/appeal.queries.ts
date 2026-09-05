@@ -5,7 +5,7 @@
 // 说明：当前申诉为“全量待复核队列”，前端为无分页的简单列表（props 形状固定），故
 // queries 返回全部匹配行 + total（不再有每表硬上限，也非“固定 limit 模拟分页”）；
 // 白名单 pageSize 能力在 schema 中预留，后续若接分页 UI 可直接复用。
-import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
+import { getSessionRlsClient } from '@/lib/auth/session-client';
 import { rowToDto } from './appeal.mapper';
 import type { AppealItem, AppealListQuery, AppealPageResult, AppealRowData } from './appeal.types';
 
@@ -13,7 +13,7 @@ import type { AppealItem, AppealListQuery, AppealPageResult, AppealRowData } fro
 async function fetchAuthorNames(ids: string[]): Promise<Record<string, string>> {
   const unique = Array.from(new Set(ids.filter((x): x is string => !!x)));
   if (!unique.length) return {};
-  const client = getSupabasePrivilegedClient();
+  const client = await getSessionRlsClient();
   const { data } = await client.from('users').select('id,name').in('id', unique);
   const names: Record<string, string> = {};
   for (const u of data ?? []) names[u.id] = u.name ?? '';
@@ -25,7 +25,9 @@ async function fetchAuthorNames(ids: string[]): Promise<Record<string, string>> 
  * （无分页 UI，返回全部匹配行；无每表 limit，无内存筛选。）
  */
 export async function listAppeals(query: AppealListQuery): Promise<AppealPageResult<AppealItem>> {
-  const client = getSupabasePrivilegedClient();
+  // 读取走 RLS 用户客户端（当前请求管理员 token）；union 视图 011 已切 security_invoker，
+  // service-role 仅保留写路径。
+  const client = await getSessionRlsClient();
   const builder = client
     .from('v_appeal_catalog')
     .select('*', { count: 'exact' })

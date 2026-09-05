@@ -1,6 +1,6 @@
 // 用户治理模块：查询层（数据访问）。
 // 分页/筛选/total 全部在数据库完成，使用 count:'exact'；status/role/anomaly/q 下沉到 where。
-import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
+import { getSessionRlsClient } from '@/lib/auth/session-client';
 import { rowToDto } from './users.mapper';
 import { DEFAULT_PAGE_SIZE, SIZES } from './users.schema';
 import type { UserItem, UserListQuery, UserPageResult, UserRowData } from './users.types';
@@ -21,7 +21,8 @@ export async function listUsers(query: UserListQuery): Promise<UserPageResult<Us
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  const client = getSupabasePrivilegedClient();
+  // 读取走 RLS 用户客户端（当前请求管理员 token），service-role 仅保留写路径。
+  const client = await getSessionRlsClient();
   let builder = client
     .from('users')
     .select(LIST_COLS, { count: 'exact' })

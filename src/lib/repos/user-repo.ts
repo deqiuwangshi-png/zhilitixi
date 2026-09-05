@@ -2,6 +2,7 @@
 // TODO: 业务逻辑已迁移至 src/modules/users（types/schema/policy/mapper/queries/commands），
 // 本文件导出仍被 components/features/users/* 与 user-actions 历史引用，保留以兼容，勿删。
 import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
+import { getSessionRlsClient } from '@/lib/auth/session-client';
 import type { UsersRow } from '@/lib/db-types';
 
 /** 请求幂等键；未提供时为 null，由数据库 RPC 内部生成。 */
@@ -68,7 +69,8 @@ function mapRow(u: UserRowData): UserListItem {
 
 /** 用户列表（含治理字段） */
 export async function listUsers(): Promise<UserListItem[]> {
-  const { data, error } = await getSupabasePrivilegedClient()
+  const client = await getSessionRlsClient();
+  const { data, error } = await client
     .from('users')
     .select(LIST_COLS)
     .order('created_at', { ascending: false });
@@ -80,7 +82,7 @@ export async function listUsers(): Promise<UserListItem[]> {
  * TODO: 分页待下沉——目前固定 limit(500)，并非“全量”，仅覆盖列表查看的最近流水；
  * 后续治理处罚流水应支持数据库分页，替换此处有界拉取。modules/users 亦复用本实现。 */
 export async function listPenaltiesGrouped(): Promise<Record<string, PenaltyRecord[]>> {
-  const client = getSupabasePrivilegedClient();
+  const client = await getSessionRlsClient();
   const { data, error } = await client
     .from('governance_penalties')
     .select('id,user_id,action,reason,operator_id,created_at')

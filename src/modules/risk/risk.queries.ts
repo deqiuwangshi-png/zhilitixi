@@ -5,7 +5,7 @@
 // - domain tab 为唯一 DB 分页检索（count:'exact' + order + range，q 下沉到 WHERE），
 //   根治旧“limit(500) 全量 + 内存 filter + slice”的模拟分页。
 // 同时返回全量 domains 供顶部“黑名单域名”统计卡使用。
-import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
+import { getSessionRlsClient } from '@/lib/auth/session-client';
 import { toRows } from './risk.mapper';
 import { DEFAULT_PAGE_SIZE, SIZES } from './risk.schema';
 import type { LinkDomainsRow, UploadAuditRow, UrlAuditRow } from '@/lib/db-types';
@@ -20,7 +20,7 @@ function sanitizePageSize(size: number): number {
 async function fetchUserNames(urlRows: UrlAuditRow[]): Promise<Record<string, string>> {
   const ids = Array.from(new Set(urlRows.map((r) => r.user_id).filter((x): x is string => !!x)));
   if (!ids.length) return {};
-  const client = getSupabasePrivilegedClient();
+  const client = await getSessionRlsClient();
   const { data: users } = await client.from('users').select('id,name').in('id', ids);
   const names: Record<string, string> = {};
   for (const u of users ?? []) names[u.id] = u.name ?? '';
@@ -34,7 +34,8 @@ async function fetchUserNames(urlRows: UrlAuditRow[]): Promise<Record<string, st
  * - domain 检索（q）下沉到 link_domains.domain / note 的 ilike。
  */
 export async function listRiskData(query: RiskListQuery): Promise<RiskListData> {
-  const client = getSupabasePrivilegedClient();
+  // 读取走 RLS 用户客户端（当前请求管理员 token），service-role 仅保留写路径。
+  const client = await getSessionRlsClient();
   const page = Math.max(1, Math.floor(query.page) || 1);
   const pageSize = sanitizePageSize(query.pageSize);
   const from = (page - 1) * pageSize;

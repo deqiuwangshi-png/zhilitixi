@@ -13,26 +13,6 @@ export interface RiskData {
   userNames: Record<string, string>;
 }
 
-/** 三数据源并行查询（含上传审核，修复原 API 缺失字段） */
-export async function listRiskData(): Promise<RiskData> {
-  const client = getSupabasePrivilegedClient();
-  const [{ data: urlAudits }, { data: domains }, { data: uploadAudits }] = await Promise.all([
-    client.from('url_audit').select('*').order('created_at', { ascending: false }).limit(200),
-    client.from('link_domains').select('*').order('created_at', { ascending: true }).limit(500),
-    client.from('upload_audit').select('*').order('created_at', { ascending: false }).limit(100),
-  ]);
-  const urlRows: UrlAuditRow[] = urlAudits ?? [];
-
-  const userIds = new Set(urlRows.map((r) => r.user_id).filter((x): x is string => !!x));
-  const userNames: Record<string, string> = {};
-  if (userIds.size) {
-    const { data: users } = await client.from('users').select('id,name').in('id', Array.from(userIds));
-    for (const u of users ?? []) userNames[u.id] = u.name ?? '';
-  }
-
-  return { urlAudits: urlRows, domains: domains ?? [], uploadAudits: uploadAudits ?? [], userNames };
-}
-
 export interface RiskActionInput {
   type: 'domain' | 'url' | 'upload';
   action: 'upsert' | 'delete' | 'approve' | 'reject';

@@ -79,10 +79,11 @@ src/
 └── hooks/                            # 共享 hooks（client）
 
 scripts/
-└── check-architecture.mjs            # 架构完整性守护（pnpm check:architecture）
+├── check-architecture.mjs            # 架构完整性守护（pnpm check:architecture）
+└── db.mjs                            # migration 执行与验证（pnpm db:migrate / db:verify，见「开发命令」）
 
 supabase/
-└── migrations/                       # schema 唯一来源（001..009：含 006 RBAC / 007 治理事务 RPC / 008/009 union 视图）
+└── migrations/                       # schema 唯一来源（001..010：含 006 RBAC / 007·010 事务 RPC / 008/009 union 视图）
 ```
 
 ## 开发命令
@@ -91,8 +92,12 @@ supabase/
 - `pnpm start` - 启动生产服务
 - `pnpm ts-check` - TypeScript 类型检查
 - `pnpm lint` - ESLint 检查
+- `pnpm test` - 单测 + 集成测试（vitest；无 `DATABASE_URL` 时真实库断言自动跳过，单测始终运行）
 - `pnpm check:architecture` - 架构完整性守护（client 边界 / 页面直连 / 旧暗取入口 / 散落 is_admin）
-- `pnpm validate` - 架构守护 + 类型 + lint + stylelint 全量校验（改动后必须全绿；stylelint 目前在 globals.css 有既有债）
+- `pnpm validate` - 架构守护 + 测试 + 类型 + lint + stylelint 全量校验（改动后必须全绿；stylelint 目前在 globals.css 有既有债）
+- `pnpm db:migrate` - 校验并按序执行 `supabase/migrations/*.sql`（执行器优先级：内置 pg 驱动＋DATABASE_URL → supabase CLI → 退化为输出逐条 psql 命令；本地无 pg/psql 时仅做文件序列校验+命令映射，不真改库）
+- `pnpm db:verify` - 对 `DATABASE_URL` 校验关键安全项（006 RBAC 表 / 007·010 事务 RPC 存在且 EXECUTE 仅 service_role / 008·009 union 视图 / 核心表 RLS），失败 exit 1；无库默认失败提示，本地无库用 `--allow-offline` 跳过
+- `pnpm deploy:preflight` - 部署门禁：`db:migrate && db:verify && validate` 全绿方可发布（migration 执行与验证必须纳入部署闭环）
 
 ## 设计规范
 - 侧边栏浅色背景 `#FFFFFF`，激活项 accent `#E8F5F1` + 左侧 3px 品牌绿竖线

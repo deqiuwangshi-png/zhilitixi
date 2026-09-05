@@ -1,5 +1,6 @@
 // 消息通知仓储层：当前用户通知列表 + 已读操作（notifications 表）。
 import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
+import { getSessionRlsClient } from '@/lib/auth/session-client';
 
 export interface NotificationItem {
   id: string;
@@ -12,7 +13,10 @@ export interface NotificationItem {
 
 /** 当前用户通知列表（未读优先，最多 20 条） */
 export async function listNotifications(userId: string): Promise<NotificationItem[]> {
-  const { data, error } = await getSupabasePrivilegedClient()
+  // 读取走 RLS 用户客户端（当前请求 token）；notifications 表 011 已启用 RLS（本人读 / 管理员读），
+  // 此处按 userId 过滤与 RLS 双重收敛，service-role 仅保留写路径。
+  const client = await getSessionRlsClient();
+  const { data, error } = await client
     .from('notifications')
     .select('id,type,title,content,read,created_at')
     .eq('user_id', userId)

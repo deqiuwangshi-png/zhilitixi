@@ -12,25 +12,6 @@ export interface RuleData {
   userNames: Record<string, string>;
 }
 
-/** 域名规则 + 违规记录（url_audit 高风险/中风险）+ 用户名联表 */
-export async function listRules(): Promise<RuleData> {
-  const client = getSupabasePrivilegedClient();
-  const [{ data: domains }, { data: urlAudits }] = await Promise.all([
-    client.from('link_domains').select('*').order('created_at', { ascending: false }).limit(500),
-    client.from('url_audit').select('*').order('created_at', { ascending: false }).limit(200),
-  ]);
-  const violations = (urlAudits ?? []).filter((u) => u.risk === 'high' || u.risk === 'medium');
-
-  const userIds = new Set(violations.map((v) => v.user_id).filter((x): x is string => !!x));
-  const userNames: Record<string, string> = {};
-  if (userIds.size) {
-    const { data: users } = await client.from('users').select('id,name').in('id', Array.from(userIds));
-    for (const u of users ?? []) userNames[u.id] = u.name ?? '';
-  }
-
-  return { domains: domains ?? [], violations, userNames };
-}
-
 export interface RuleActionInput {
   action: 'addDomain' | 'toggleDomain' | 'deleteDomain';
   domain: string;

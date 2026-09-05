@@ -4,17 +4,8 @@ import type { AnnouncementsRow } from '@/lib/db-types';
 
 export type ActivityItem = AnnouncementsRow;
 
-/** 活动/公告/Banner 列表（按 sort + created_at 排序） */
-export async function listActivities(): Promise<ActivityItem[]> {
-  const { data, error } = await getSupabasePrivilegedClient()
-    .from('announcements')
-    .select('*')
-    .order('sort', { ascending: true })
-    .order('created_at', { ascending: false })
-    .limit(100);
-  if (error) throw new Error(`listActivities failed: ${error.message}`);
-  return data ?? [];
-}
+// 注：列表查询已迁移至 src/modules/activity/activity.queries.ts（listActivities 支持分页），
+// 旧仓储层不再保留固定 limit(100) 的全表拉取。
 
 export interface ActivitySaveInput {
   id?: string;

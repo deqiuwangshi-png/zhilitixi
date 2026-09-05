@@ -3,8 +3,7 @@
 // 数据库编排在本层完成。总览为聚合面板，非分页列表：趋势 / TOP 举报 / 处罚分布等
 // 因需对全量或近 N 天窗口做聚合，采用有界投影拉取（净量计数）而非“固定 limit 模拟分页”。
 // 部分计数（totalUsers / pendingVerifications）已下推为数据库 count:'exact'。
-import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
-import { fetchUserNames } from '@/lib/dao';
+import { getSessionRlsClient } from '@/lib/auth/session-client';
 import {
   buildPenaltyDist,
   buildRiskUsers,
@@ -18,9 +17,21 @@ import {
 import type { ReportsRow, UrlAuditRow } from '@/lib/db-types';
 import type { OverviewData, TopReport } from './overview.types';
 
+/** 页内用户名联表（RLS 用户客户端，仅回查窗口对应用户） */
+async function fetchUserNames(ids: string[]): Promise<Record<string, string>> {
+  const unique = Array.from(new Set(ids.filter((x): x is string => !!x)));
+  if (!unique.length) return {};
+  const client = await getSessionRlsClient();
+  const { data } = await client.from('users').select('id,name').in('id', unique);
+  const names: Record<string, string> = {};
+  for (const u of data ?? []) names[u.id] = u.name ?? '';
+  return names;
+}
+
 /** 治理总览：首页全部统计的真实查询（纯只读，无写命令） */
 export async function getOverviewData(): Promise<OverviewData> {
-  const client = getSupabasePrivilegedClient();
+  // 读取走 RLS 用户客户端（当前请求管理员 token），service-role 仅保留写路径。
+  const client = await getSessionRlsClient();
 
   // === 举报数据（有界投影拉取：近 30 日聚合窗口足够，不做全表拖取） ===
   const { data: reports } = await client.from('reports').select('created_at,status,reason,target_type,target_id,reporter_id,id');

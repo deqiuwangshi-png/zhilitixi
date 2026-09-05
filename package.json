@@ -5,14 +5,18 @@
   "scripts": {
     "build": "bash ./scripts/build.sh",
     "check:architecture": "node scripts/check-architecture.mjs",
+    "db:migrate": "node scripts/db.mjs migrate",
+    "db:verify": "node scripts/db.mjs verify",
+    "deploy:preflight": "pnpm db:migrate && pnpm db:verify && pnpm validate",
     "dev": "next dev",
     "preinstall": "npx only-allow pnpm",
     "lint": "eslint",
     "lint:build": "eslint . --quiet",
     "lint:style": "stylelint \"src/**/*.css\"",
     "start": "bash ./scripts/start.sh",
+    "test": "vitest run",
     "ts-check": "tsc -p tsconfig.json",
-    "validate": "pnpm check:architecture && pnpm dlx concurrently --group --names lint-tsc,lint-build,lint-style \"pnpm ts-check\" \"pnpm lint:build\" \"pnpm lint:style\""
+    "validate": "pnpm check:architecture && pnpm test && pnpm dlx concurrently --group --names lint-tsc,lint-build,lint-style \"pnpm ts-check\" \"pnpm lint:build\" \"pnpm lint:style\""
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.958.0",
@@ -73,11 +77,13 @@
     "@react-dev-inspector/middleware": "^2.0.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pg": "8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "only-allow": "^1.2.2",
+    "pg": "8.23.0",
     "react-dev-inspector": "^2.0.1",
     "shadcn": "latest",
     "stylelint": "^16.4.0",
@@ -85,7 +91,8 @@
     "tailwindcss": "^4",
     "tsup": "^8.3.5",
     "tsx": "^4.19.2",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "5.0.0"
   },
   "packageManager": "pnpm@9.0.0",
   "engines": {
