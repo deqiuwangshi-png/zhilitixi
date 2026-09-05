@@ -1,5 +1,11 @@
-import { requireAdmin } from '@/lib/auth';
-import { listActivities } from '@/lib/repos/activity-repo';
+import {
+  requireActivityRead,
+  listActivities,
+  listAllActivities,
+  activityListQuerySchema,
+  toActivityListQuery,
+  type ActivityItem,
+} from '@/modules/activity';
 import { ActivityStats } from '@/components/features/activity/activity-stats';
 import { ActivityClient } from '@/components/features/activity/activity-client';
 
@@ -9,42 +15,44 @@ export interface ActivityPageParams {
   page?: string;
 }
 
-const PAGE_SIZE = 10;
-
 export const dynamic = 'force-dynamic';
 
-// 活动上架编辑（RSC：统计卡服务端计算 + 筛选/分页，零客户端 fetch）
+// 活动上架编辑（RSC：统计卡服务端计算 + 数据库分页筛选，零客户端 fetch；写操作走 Server Actions）
+// ActivityClient 的 current 保持原始 searchParams 形状（字段兼容，不改动）。
+const EMPTY_RESULT = { rows: [] as ActivityItem[], total: 0, page: 1, pageSize: 10, totalPages: 1 };
+
 export default async function ActivityPage({
   searchParams,
 }: {
   searchParams: Promise<ActivityPageParams>;
 }) {
   const params = await searchParams;
-  await requireAdmin();
+  await requireActivityRead();
 
-  const items = await listActivities();
+  const items = await listAllActivities();
 
-  // 服务端筛选
-  let filtered = items;
-  if (params.kind && params.kind !== 'all') filtered = filtered.filter((a) => a.kind === params.kind);
-  if (params.q?.trim()) {
-    const q = params.q.trim().toLowerCase();
-    filtered = filtered.filter(
-      (a) => `${a.title ?? ''}${a.description ?? ''}`.toLowerCase().includes(q)
+  const parsed = activityListQuerySchema.safeParse(params);
+  if (!parsed.success) {
+    return (
+      <div className="space-y-4">
+        <ActivityStats items={items} />
+        <ActivityClient
+          rows={EMPTY_RESULT.rows}
+          total={EMPTY_RESULT.total}
+          page={EMPTY_RESULT.page}
+          totalPages={EMPTY_RESULT.totalPages}
+          current={params}
+        />
+      </div>
     );
   }
 
-  // 服务端分页
-  const page = Math.max(1, Number(params.page) || 1);
-  const total = filtered.length;
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const safePage = Math.min(page, totalPages);
-  const pageRows = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  const { rows, total, page, totalPages } = await listActivities(toActivityListQuery(parsed.data));
 
   return (
     <div className="space-y-4">
       <ActivityStats items={items} />
-      <ActivityClient rows={pageRows} total={total} page={safePage} totalPages={totalPages} current={params} />
+      <ActivityClient rows={rows} total={total} page={page} totalPages={totalPages} current={params} />
     </div>
   );
 }

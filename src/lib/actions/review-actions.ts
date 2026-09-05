@@ -2,9 +2,8 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { requireAdmin } from '@/lib/auth';
-import { applyReview } from '@/lib/repos/content-repo';
-import { reviewActionSchema, type ReviewActionInput } from '@/lib/validations/review.schema';
+import { AuthError } from '@/lib/auth/errors';
+import { reviewActionSchema, type ReviewActionInput, reviewItem, batchReviewItems } from '@/modules/content-review';
 
 export interface ActionResult {
   ok: boolean;
@@ -12,16 +11,17 @@ export interface ActionResult {
 }
 
 function toError(e: unknown): string {
+  if (e instanceof AuthError) return e.message;
   return e instanceof Error ? e.message : String(e);
 }
 
-/** 单条审核（通过 / 驳回） */
+/** 单条审核（通过 / 驳回）：授权 + 校验 + 写库委托模块命令层 */
 export async function reviewContent(input: ReviewActionInput): Promise<ActionResult> {
   try {
-    await requireAdmin();
     const parsed = reviewActionSchema.safeParse(input);
     if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '输入不合法' };
-    await applyReview(parsed.data);
+    // 命中的命令内部做 review.apply 授权并写库
+    await reviewItem(parsed.data);
     revalidatePath('/content-review');
     return { ok: true };
   } catch (e) {
@@ -29,13 +29,10 @@ export async function reviewContent(input: ReviewActionInput): Promise<ActionRes
   }
 }
 
-/** 批量审核 */
+/** 批量审核：授权 + 批量校验 + 顺序写库均委托模块命令层 */
 export async function batchReviewContent(inputs: ReviewActionInput[]): Promise<ActionResult> {
   try {
-    await requireAdmin();
-    if (!Array.isArray(inputs) || inputs.length === 0) return { ok: false, error: '未选择任何内容' };
-    const parsed = inputs.map((i) => reviewActionSchema.parse(i));
-    await Promise.all(parsed.map((i) => applyReview(i)));
+    await batchReviewItems(inputs);
     revalidatePath('/content-review');
     return { ok: true };
   } catch (e) {

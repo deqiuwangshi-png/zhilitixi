@@ -60,7 +60,8 @@ function humanTarget(r: ReportsRow): string {
   return String(r.target_id).length > 20 ? String(r.target_id).slice(0, 16) + '…' : String(r.target_id);
 }
 
-/** 举报列表（含编号、举报人/被举报人联表、重复举报统计） */
+// TODO(阶段六): listReports 已迁移至 src/modules/report/report.queries.ts（数据库分页，不再固定 500 条）。
+// 本文件保留以兼容 report 前端组件仍从 @/lib/repos/report-repo 引用的 ReportItem 类型，勿删仍被引用的导出。
 export async function listReports(): Promise<ReportItem[]> {
   const client = getSupabaseClient();
   const { data: reports } = await client

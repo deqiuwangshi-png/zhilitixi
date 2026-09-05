@@ -1,3 +1,4 @@
+import 'server-only';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { getReportBuffer, createWrappedFetch } from 'coze-coding-dev-sdk';
 import dotenv from 'dotenv';
@@ -45,21 +46,38 @@ function getSupabaseServiceRoleKey(): string | undefined {
   return process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.COZE_SUPABASE_SERVICE_ROLE_KEY;
 }
 
-function getSupabaseClient(token?: string): SupabaseClient<Database> {
+function getSupabasePublicClient(): SupabaseClient<Database> {
   const { url, anonKey } = getSupabaseCredentials();
+  return buildClient(url, anonKey, undefined);
+}
 
-  // 带用户 token 的客户端：请求级新建（登录/中间件校验用），不做缓存
-  if (token) {
-    return buildClient(url, anonKey, { Authorization: `Bearer ${token}` });
+function getSupabaseRlsClient(token: string): SupabaseClient<Database> {
+  const { url, anonKey } = getSupabaseCredentials();
+  return buildClient(url, anonKey, { Authorization: `Bearer ${token}` });
+}
+
+function getSupabasePrivilegedClient(): SupabaseClient<Database> {
+  const { url } = getSupabaseCredentials();
+  const serviceRoleKey = getSupabaseServiceRoleKey();
+  if (!serviceRoleKey) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY is required for privileged operations');
   }
-
-  // 服务端 service-role 客户端：进程级单例（消除每请求 createClient 的开销）
   const globalForSupabase = globalThis as unknown as { __govSupabaseServerClient?: SupabaseClient<Database> };
   if (!globalForSupabase.__govSupabaseServerClient) {
-    const serviceRoleKey = getSupabaseServiceRoleKey();
-    globalForSupabase.__govSupabaseServerClient = buildClient(url, serviceRoleKey ?? anonKey, undefined);
+    globalForSupabase.__govSupabaseServerClient = buildClient(url, serviceRoleKey, undefined);
   }
   return globalForSupabase.__govSupabaseServerClient;
+}
+
+// 兼容现有业务 repo；新认证代码必须明确选择 RLS 或 privileged 客户端。
+function getSupabaseClient(): SupabaseClient<Database> {
+  const { url, anonKey } = getSupabaseCredentials();
+  const globalForSupabase = globalThis as unknown as { __govSupabaseLegacyClient?: SupabaseClient<Database> };
+  if (!globalForSupabase.__govSupabaseLegacyClient) {
+    const serviceRoleKey = getSupabaseServiceRoleKey();
+    globalForSupabase.__govSupabaseLegacyClient = buildClient(url, serviceRoleKey ?? anonKey, undefined);
+  }
+  return globalForSupabase.__govSupabaseLegacyClient;
 }
 
 function buildClient(url: string, key: string, authHeaders: Record<string, string> | undefined): SupabaseClient<Database> {
@@ -88,4 +106,12 @@ function buildClient(url: string, key: string, authHeaders: Record<string, strin
   });
 }
 
-export { loadEnv, getSupabaseCredentials, getSupabaseServiceRoleKey, getSupabaseClient };
+export {
+  loadEnv,
+  getSupabaseCredentials,
+  getSupabaseServiceRoleKey,
+  getSupabasePublicClient,
+  getSupabaseRlsClient,
+  getSupabasePrivilegedClient,
+  getSupabaseClient,
+};

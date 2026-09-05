@@ -211,6 +211,57 @@ type TableDef<T extends Record<string, unknown>> = {
   Relationships: [];
 };
 
+// ---------- 008 迁移：跨表合并统一列表的只读视图 ----------
+// v_product_catalog：discoveries（商业化内容）∪ square_posts（带链接帖子）
+export type ProductCatalogViewRow = {
+  id: string;
+  src: string; // 'discovery' | 'square'
+  author_id: string | null;
+  created_at: string | null;
+  note: string | null;
+  title: string | null;
+  description: string | null;
+  content_type: string | null; // discoveries.type
+  commercial: boolean | null;
+  promo_type: string | null;
+  commission: string | null;
+  url: string | null;
+  reason: string | null; // discoveries.reason（square 侧复用 url_status）
+  content: string | null; // square_posts.content
+  category: string | null; // square_posts.category
+  url_status: string | null; // square_posts.url_status
+  down_flag: boolean; // 归一化下架标记
+  search_text: string | null; // 归一化可检索拼接
+};
+
+// v_content_review_catalog：discoveries ∪ square_posts ∪ url_audit
+export type ContentReviewCatalogViewRow = {
+  id: string;
+  src: string; // 'discovery' | 'square' | 'url'
+  author_id: string | null;
+  created_at: string | null;
+  title: string | null;
+  note: string | null;
+  description: string | null;
+  content: string | null; // square_posts.content
+  media_url: string | null; // discoveries.media_url
+  image_url: string | null; // square_posts.image_url
+  type: string | null; // discoveries.type
+  category: string | null; // square_posts.category
+  review_status: string | null; // discoveries/square_posts.review_status
+  reason: string | null; // discoveries.reason
+  url_status: string | null; // square_posts.url_status
+  url: string | null; // url_audit.url
+  host: string | null; // url_audit.host
+  risk: string | null; // url_audit.risk
+  views: number | null;
+  url_id: number | null; // url_audit.id（int8 → number）
+  author_name: string | null; // 联表用户名
+  norm_status: string; // 归一化审核状态 pending/approved/rejected
+  norm_category: string; // 归一化分类（含默认值）
+  search_text: string | null; // 归一化可检索拼接
+};
+
 export interface Database {
   public: {
     Tables: {
@@ -232,7 +283,16 @@ export interface Database {
       follows: TableDef<FollowsRow>;
       view_events: TableDef<ViewEventsRow>;
     };
-    Views: Record<string, never>;
+    Views: {
+      v_product_catalog: {
+        Row: ProductCatalogViewRow;
+        Relationships: [];
+      };
+      v_content_review_catalog: {
+        Row: ContentReviewCatalogViewRow;
+        Relationships: [];
+      };
+    };
     Functions: {
       list_user_sessions: {
         Args: { uid: string };
@@ -257,6 +317,17 @@ export interface Database {
       rls_auto_enable: {
         Args: Record<string, never>;
         Returns: undefined;
+      };
+      apply_governance_action: {
+        Args: {
+          p_user_id: string;
+          p_action: string;
+          p_reason?: string;
+          p_operator_id?: string | null;
+          p_request_id?: string | null;
+          p_occurred_at?: string;
+        };
+        Returns: unknown;
       };
     };
     Enums: Record<string, never>;

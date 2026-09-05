@@ -1,6 +1,13 @@
 // 用户管理仓储层：唯一数据访问入口（用户列表 / 治理详情 / 治理操作落库 + 处罚流水）。
+// TODO: 业务逻辑已迁移至 src/modules/users（types/schema/policy/mapper/queries/commands），
+// 本文件导出仍被 components/features/users/* 与 user-actions 历史引用，保留以兼容，勿删。
 import { getSupabaseClient } from '@/storage/database/supabase-client';
 import type { UsersRow } from '@/lib/db-types';
+
+/** 请求幂等键；未提供时为 null，由数据库 RPC 内部生成。 */
+function toRpcRequestId(requestId?: string): string | null {
+  return requestId && requestId.length > 0 ? requestId : null;
+}
 
 export type GovStatus = 'normal' | 'limited' | 'banned';
 export type GovRole = 'user' | 'moderator';
@@ -69,7 +76,9 @@ export async function listUsers(): Promise<UserListItem[]> {
   return (data ?? []).map(mapRow);
 }
 
-/** 全量处罚流水，按 user_id 分组（一次查询，供列表详情抽屉；Record 便于 RSC 序列化） */
+/** 处罚流水，按 user_id 分组（供列表详情抽屉；Record 便于 RSC 序列化）。
+ * TODO: 分页待下沉——目前固定 limit(500)，并非“全量”，仅覆盖列表查看的最近流水；
+ * 后续治理处罚流水应支持数据库分页，替换此处有界拉取。modules/users 亦复用本实现。 */
 export async function listPenaltiesGrouped(): Promise<Record<string, PenaltyRecord[]>> {
   const client = getSupabaseClient();
   const { data, error } = await client
@@ -119,75 +128,33 @@ async function appendPenalty(
   if (error) throw new Error(`appendPenalty failed: ${error.message}`);
 }
 
-interface GovFields {
-  anomaly: string | null;
-  penalty_count: number | null;
-  gov_status: string | null;
+/** 调用事务 RPC：同一数据库事务内更新治理状态 + 处罚流水 + 审计日志 */
+async function applyGovernanceActionViaRpc(
+  id: string,
+  action: 'ban' | 'unban' | 'limit' | 'unlimit' | 'normal',
+  reason: string,
+  operatorId: string,
+  requestId?: string
+): Promise<void> {
+  const { error } = await getSupabaseClient().rpc('apply_governance_action', {
+    p_user_id: id,
+    p_action: action,
+    p_reason: reason,
+    p_operator_id: operatorId,
+    p_request_id: toRpcRequestId(requestId),
+  });
+  if (error) throw new Error(`apply_governance_action rpc failed: ${error.message}`);
 }
 
-async function getRawGov(id: string): Promise<GovFields> {
-  const { data, error } = await getSupabaseClient()
-    .from('users')
-    .select('anomaly,penalty_count,gov_status')
-    .eq('id', id)
-    .maybeSingle();
-  if (error) throw new Error(`getGov failed: ${error.message}`);
-  return data ?? { anomaly: null, penalty_count: null, gov_status: null };
-}
-
-/** 治理动作（封禁/限流/恢复）：更新治理列 + 写流水 */
+/** 治理动作（封禁/限流/恢复）：更新治理列 + 处罚流水 + 审计，走事务 RPC（同成功/同失败） */
 export async function applyGovAction(
   id: string,
   action: 'ban' | 'unban' | 'limit' | 'unlimit' | 'normal',
   reason: string,
-  operatorId: string
+  operatorId: string,
+  requestId?: string
 ): Promise<void> {
-  const cur = await getRawGov(id);
-  const now = new Date();
-  const banUntil = new Date(now.getTime() + 7 * 24 * 3600 * 1000).toISOString();
-  const limitUntil = new Date(now.getTime() + 24 * 3600 * 1000).toISOString();
-
-type GovPatch = Partial<Pick<UsersRow, 'gov_status' | 'ban_until' | 'rate_limit_until' | 'anomaly' | 'penalty_count'>>;
-
-  let patch: GovPatch = {};
-  let penAction: PenaltyAction = 'unban';
-
-  switch (action) {
-    case 'ban':
-      patch = {
-        gov_status: 'banned',
-        ban_until: banUntil,
-        anomaly: cur.anomaly || '封禁标记',
-        penalty_count: (cur.penalty_count ?? 0) + 1,
-      };
-      penAction = 'ban';
-      break;
-    case 'limit':
-      patch = {
-        gov_status: 'limited',
-        rate_limit_until: limitUntil,
-        anomaly: cur.anomaly || '限流标记',
-        penalty_count: (cur.penalty_count ?? 0) + 1,
-      };
-      penAction = 'limit';
-      break;
-    case 'normal':
-      patch = { gov_status: 'normal', ban_until: null, rate_limit_until: null, anomaly: '' };
-      penAction = 'unban';
-      break;
-    case 'unban':
-      patch = { gov_status: 'normal', ban_until: null };
-      penAction = 'unban';
-      break;
-    case 'unlimit':
-      patch = { gov_status: 'normal', rate_limit_until: null };
-      penAction = 'unlimit';
-      break;
-  }
-
-  const { error } = await getSupabaseClient().from('users').update(patch).eq('id', id);
-  if (error) throw new Error(`applyGovAction failed: ${error.message}`);
-  await appendPenalty(id, penAction, reason, operatorId);
+  await applyGovernanceActionViaRpc(id, action, reason, operatorId, requestId);
 }
 
 /** 角色调整：更新治理列 + 写流水 */

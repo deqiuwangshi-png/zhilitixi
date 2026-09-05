@@ -1,4 +1,6 @@
 // 商品治理仓储层：商业化内容合并列表 + 编辑/删除写操作。
+// TODO: 模块化迁移至 src/modules/product-gov（查询走 `listProducts` / `getProductStats`，
+// 写操作经 commands 复用本文件的 applyProductEdit/deleteProduct）。以下导出保留供旧引用兼容。
 import { getSupabaseClient } from '@/storage/database/supabase-client';
 import type { DiscoveriesRow, SquarePostsRow } from '@/lib/db-types';
 

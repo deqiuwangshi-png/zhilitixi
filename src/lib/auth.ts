@@ -2,17 +2,12 @@
 // 供 RSC 页面 / Server Actions / Route Handlers 使用。
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { createClient } from '@supabase/supabase-js';
-import { getSupabaseCredentials, getSupabaseClient } from '@/storage/database/supabase-client';
+import { getSupabaseRlsClient } from '@/storage/database/supabase-client';
 import { SESSION_COOKIE } from '@/lib/auth-cookies';
 
 /** 用用户 token 创建 anon+JWT 客户端（校验用，不缓存） */
 export function getUserClient(token: string) {
-  const { url, anonKey } = getSupabaseCredentials();
-  return createClient(url, anonKey, {
-    global: { headers: { Authorization: `Bearer ${token}` } },
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
+  return getSupabaseRlsClient(token);
 }
 
 /** 读取当前登录用户（无则 null） */
@@ -34,7 +29,7 @@ export interface CurrentAdmin {
 export async function getCurrentAdmin(): Promise<CurrentAdmin | null> {
   const user = await getCurrentUser();
   if (!user) return null;
-  const { data } = await getSupabaseClient()
+  const { data } = await getUserClient((await cookies()).get(SESSION_COOKIE)?.value ?? '')
     .from('users')
     .select('id,name,is_admin')
     .eq('id', user.id)

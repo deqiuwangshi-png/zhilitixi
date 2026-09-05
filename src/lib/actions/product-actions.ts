@@ -2,9 +2,12 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { requireAdmin } from '@/lib/auth';
-import { applyProductEdit, deleteProduct } from '@/lib/repos/product-repo';
-import { productEditSchema, productDeleteSchema, type ProductEditInput, type ProductDeleteInput } from '@/lib/validations/product.schema';
+import {
+  applyProductEdit,
+  deleteProduct,
+  type ProductEditInput,
+  type ProductDeleteInput,
+} from '@/modules/product-gov';
 
 export interface ActionResult {
   ok: boolean;
@@ -18,10 +21,7 @@ function toError(e: unknown): string {
 /** 保存商品编辑 */
 export async function saveProduct(input: ProductEditInput): Promise<ActionResult> {
   try {
-    await requireAdmin();
-    const parsed = productEditSchema.safeParse(input);
-    if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '输入不合法' };
-    await applyProductEdit(parsed.data);
+    await applyProductEdit(input);
     revalidatePath('/product-gov');
     return { ok: true };
   } catch (e) {
@@ -32,10 +32,7 @@ export async function saveProduct(input: ProductEditInput): Promise<ActionResult
 /** 删除商品（真删） */
 export async function removeProduct(input: ProductDeleteInput): Promise<ActionResult> {
   try {
-    await requireAdmin();
-    const parsed = productDeleteSchema.safeParse(input);
-    if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '输入不合法' };
-    await deleteProduct(parsed.data.source, parsed.data.id);
+    await deleteProduct(input);
     revalidatePath('/product-gov');
     return { ok: true };
   } catch (e) {

@@ -3,7 +3,7 @@
 // 注意：仅依赖 process.env（middleware 运行环境不加载服务端模块，避免拖入上报 SDK）。
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { SESSION_COOKIE, REFRESH_COOKIE, cookieOpts } from '@/lib/auth-cookies';
+import { SESSION_COOKIE, REFRESH_COOKIE, cookieOpts, refreshCookieOpts } from '@/lib/auth-cookies';
 
 export const config = {
   matcher: ['/((?!_next/static|_next/image|favicon.ico|login|api/auth).*)'],
@@ -12,7 +12,9 @@ export const config = {
 export async function middleware(req: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-  if (!url || !anonKey) return NextResponse.next(); // env 缺失时放行，由页面兜底
+  if (!url || !anonKey) {
+    return new NextResponse('Authentication service is not configured', { status: 500 });
+  }
 
   const token = req.cookies.get(SESSION_COOKIE)?.value;
   const refreshToken = req.cookies.get(REFRESH_COOKIE)?.value;
@@ -36,9 +38,8 @@ export async function middleware(req: NextRequest) {
       });
       if (!refreshError && data.session) {
         const res = NextResponse.next();
-        const opts = cookieOpts();
-        res.cookies.set(SESSION_COOKIE, data.session.access_token, opts);
-        res.cookies.set(REFRESH_COOKIE, data.session.refresh_token, opts);
+        res.cookies.set(SESSION_COOKIE, data.session.access_token, cookieOpts());
+        res.cookies.set(REFRESH_COOKIE, data.session.refresh_token, refreshCookieOpts());
         return res;
       }
     }

@@ -1,5 +1,11 @@
-import { requireAdmin } from '@/lib/auth';
-import { listContent } from '@/lib/repos/content-repo';
+import {
+  requireReviewApply,
+  listContent,
+  listCategories,
+  reviewListQuerySchema,
+  toReviewListQuery,
+  type ReviewItem,
+} from '@/modules/content-review';
 import { ReviewFilters } from '@/components/features/review/review-filters';
 import { ReviewTable } from '@/components/features/review/review-table';
 
@@ -14,41 +20,48 @@ export interface ReviewPageParams {
 
 export const dynamic = 'force-dynamic';
 
-// 内容审核（RSC：服务端筛选 + 分页，零客户端 fetch；操作走 Server Actions）
+const EMPTY_RESULT = { rows: [] as ReviewItem[], total: 0, page: 1, pageSize: 10, totalPages: 1 };
+
+// 内容审核（RSC：三表合并 + 库内排序 + 合并行内筛选分页，零客户端 fetch；操作走 Server Actions）
+// ReviewFilters 的 current 保持原始 searchParams 形状（字段兼容，不改动组件）。
 export default async function ContentReviewPage({
   searchParams,
 }: {
   searchParams: Promise<ReviewPageParams>;
 }) {
   const params = await searchParams;
-  await requireAdmin();
+  await requireReviewApply();
 
-  const items = await listContent();
+  const categories = await listCategories();
 
-  // 服务端筛选
-  let filtered = items;
-  if (params.status && params.status !== 'all') filtered = filtered.filter((r) => r.status === params.status);
-  if (params.type && params.type !== 'all') filtered = filtered.filter((r) => r.typeKind === params.type);
-  if (params.category && params.category !== 'all') filtered = filtered.filter((r) => r.category === params.category);
-  if (params.q?.trim()) {
-    const q = params.q.trim().toLowerCase();
-    filtered = filtered.filter((r) => r.title.toLowerCase().includes(q) || r.authorName.toLowerCase().includes(q));
+  const parsed = reviewListQuerySchema.safeParse(params);
+  if (!parsed.success) {
+    return (
+      <div className="space-y-4">
+        <ReviewFilters current={params} categories={categories} />
+        <ReviewTable
+          rows={EMPTY_RESULT.rows}
+          total={EMPTY_RESULT.total}
+          page={EMPTY_RESULT.page}
+          pageSize={EMPTY_RESULT.pageSize}
+          totalPages={EMPTY_RESULT.totalPages}
+        />
+      </div>
+    );
   }
 
-  const categories = Array.from(new Set(items.map((r) => r.category).filter(Boolean)));
-
-  // 服务端分页
-  const pageSize = params.size ? Number(params.size) : 10;
-  const page = Math.max(1, Number(params.page) || 1);
-  const total = filtered.length;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const safePage = Math.min(page, totalPages);
-  const pageRows = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
+  const result = await listContent(toReviewListQuery(parsed.data));
 
   return (
     <div className="space-y-4">
       <ReviewFilters current={params} categories={categories} />
-      <ReviewTable rows={pageRows} total={total} page={safePage} pageSize={pageSize} totalPages={totalPages} />
+      <ReviewTable
+        rows={result.rows}
+        total={result.total}
+        page={result.page}
+        pageSize={result.pageSize}
+        totalPages={result.totalPages}
+      />
     </div>
   );
 }

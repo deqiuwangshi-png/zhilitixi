@@ -1,4 +1,8 @@
 // 内容审核仓储层：三表（discoveries / square_posts / url_audit）合并列表 + 审核写操作。
+// TODO(模块化迁移)：内容审核已迁移至 src/modules/content-review，页面/Server Actions 改从
+// 模块导入（listContent / reviewItem / batchReviewItems）。本文件导出仍被
+// components/features/review/review-table.tsx（ContentItem 类型）引用，故保留不动，
+// 仅供兼容；listContent / applyReview 已不再被业务入口调用。
 import { getSupabaseClient } from '@/storage/database/supabase-client';
 import type { ReviewActionInput } from '@/lib/validations/review.schema';
 

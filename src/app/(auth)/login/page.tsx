@@ -4,7 +4,7 @@ import { useActionState } from 'react';
 import { ShieldCheck, Lock } from 'lucide-react';
 import { loginAction, type LoginState } from '@/lib/auth-actions';
 
-const initial: LoginState = { error: '' };
+const initial: LoginState = { error: '', code: null };
 
 export default function LoginPage() {
   const [state, formAction] = useActionState(loginAction, initial);

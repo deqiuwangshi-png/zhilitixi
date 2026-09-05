@@ -3,10 +3,10 @@
 
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
-import { getSupabaseCredentials } from '@/storage/database/supabase-client';
-import { SESSION_COOKIE, REFRESH_COOKIE, cookieOpts } from '@/lib/auth-cookies';
+import { getSupabasePublicClient } from '@/storage/database/supabase-client';
+import { SESSION_COOKIE, REFRESH_COOKIE, cookieOpts, refreshCookieOpts } from '@/lib/auth-cookies';
+import { AUTH_ERROR_CODES, type AuthErrorCode } from '@/lib/auth/errors';
 
 const loginSchema = z.object({
   email: z.string().email('邮箱格式不正确'),
@@ -15,7 +15,13 @@ const loginSchema = z.object({
 
 export interface LoginState {
   error: string;
+  code: AuthErrorCode | null;
 }
+
+const LOGIN_VALIDATION_ERROR: LoginState = {
+  error: '邮箱或密码格式不正确',
+  code: AUTH_ERROR_CODES.VALIDATION_FAILED,
+};
 
 export async function loginAction(_prev: LoginState, formData: FormData): Promise<LoginState> {
   const parsed = loginSchema.safeParse({
@@ -23,23 +29,23 @@ export async function loginAction(_prev: LoginState, formData: FormData): Promis
     password: formData.get('password'),
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? '输入不合法' };
+    return LOGIN_VALIDATION_ERROR;
   }
 
-  const { url, anonKey } = getSupabaseCredentials();
-  const sb = createClient(url, anonKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
+  const sb = getSupabasePublicClient();
 
   const { data, error } = await sb.auth.signInWithPassword(parsed.data);
   if (error || !data.session) {
-    return { error: error?.message ?? '登录失败' };
+    // 不暴露 Supabase 原始错误；统一映射为凭据无效，避免账号枚举风险
+    return {
+      error: '邮箱或密码不正确',
+      code: AUTH_ERROR_CODES.PASSWORD_INVALID,
+    };
   }
 
   const store = await cookies();
-  const opts = cookieOpts();
-  store.set(SESSION_COOKIE, data.session.access_token, opts);
-  store.set(REFRESH_COOKIE, data.session.refresh_token, opts);
+  store.set(SESSION_COOKIE, data.session.access_token, cookieOpts());
+  store.set(REFRESH_COOKIE, data.session.refresh_token, refreshCookieOpts());
   redirect('/');
 }
 
