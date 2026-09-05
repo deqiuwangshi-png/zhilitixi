@@ -4,13 +4,10 @@
 // 本文件的 applyRuleAction。以下导出保留供旧前端组件（从 @/lib/repos/rule-repo 引用
 // RuleData）兼容，勿删仍被引用的导出。
 import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
-import type { LinkDomainsRow, UrlAuditRow } from '@/lib/db-types';
+import type { RuleData } from '@/modules/rules';
 
-export interface RuleData {
-  domains: LinkDomainsRow[];
-  violations: UrlAuditRow[];
-  userNames: Record<string, string>;
-}
+// 类型单一来源 = modules/rules（与旧定义同形，结构兼容）。
+export type { RuleData };
 
 export interface RuleActionInput {
   action: 'addDomain' | 'toggleDomain' | 'deleteDomain';

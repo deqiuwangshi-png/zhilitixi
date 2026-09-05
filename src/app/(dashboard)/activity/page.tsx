@@ -1,7 +1,7 @@
 import {
   requireActivityRead,
   listActivities,
-  listAllActivities,
+  getActivityStats,
   activityListQuerySchema,
   toActivityListQuery,
   type ActivityItem,
@@ -29,13 +29,13 @@ export default async function ActivityPage({
   const params = await searchParams;
   await requireActivityRead();
 
-  const items = await listAllActivities();
+  const stats = await getActivityStats();
 
   const parsed = activityListQuerySchema.safeParse(params);
   if (!parsed.success) {
     return (
       <div className="space-y-4">
-        <ActivityStats items={items} />
+        <ActivityStats data={stats} />
         <ActivityClient
           rows={EMPTY_RESULT.rows}
           total={EMPTY_RESULT.total}
@@ -51,7 +51,7 @@ export default async function ActivityPage({
 
   return (
     <div className="space-y-4">
-      <ActivityStats items={items} />
+      <ActivityStats data={stats} />
       <ActivityClient rows={rows} total={total} page={page} totalPages={totalPages} current={params} />
     </div>
   );

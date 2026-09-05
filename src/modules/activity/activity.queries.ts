@@ -3,7 +3,7 @@
 import { getSessionRlsClient } from '@/lib/auth/session-client';
 import { rowToDto } from './activity.mapper';
 import { DEFAULT_PAGE_SIZE, SIZES } from './activity.schema';
-import type { ActivityItem, ActivityListQuery, ActivityPageResult, ActivityRowData } from './activity.types';
+import type { ActivityItem, ActivityListQuery, ActivityPageResult, ActivityRowData, ActivityStatsData } from './activity.types';
 
 /** listActivities 的 select 投影列 */
 const LIST_COLS =
@@ -50,15 +50,12 @@ export async function listActivities(query: ActivityListQuery): Promise<Activity
   };
 }
 
-/** 全量活动（供顶部统计卡：总数 / 上架中 / 已下线），与旧 activity-repo.listActivities 行为一致 */
-export async function listAllActivities(): Promise<ActivityItem[]> {
+/** 顶部统计卡数据：总数 / 上架中（数据库 count:'exact' 全量统计，杜绝有界列表少算） */
+export async function getActivityStats(): Promise<ActivityStatsData> {
   const client = await getSessionRlsClient();
-  const { data, error } = await client
-    .from('announcements')
-    .select(LIST_COLS)
-    .order('sort', { ascending: true })
-    .order('created_at', { ascending: false })
-    .limit(100);
-  if (error) throw new Error(`listAllActivities failed: ${error.message}`);
-  return (data ?? []).map(rowToDto);
+  const [{ count: total }, { count: active }] = await Promise.all([
+    client.from('announcements').select('id', { count: 'exact', head: true }),
+    client.from('announcements').select('id', { count: 'exact', head: true }).eq('active', true),
+  ]);
+  return { total: total ?? 0, active: active ?? 0 };
 }

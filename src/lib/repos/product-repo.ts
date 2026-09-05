@@ -3,36 +3,10 @@
 // 写操作经 commands 复用本文件的 applyProductEdit/deleteProduct）。以下导出保留供旧引用兼容。
 import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
 import type { DiscoveriesRow, SquarePostsRow } from '@/lib/db-types';
+import type { ProductItem, ProductSource, ProductStatus, ProductStats } from '@/modules/product-gov';
 
-export type ProductSource = 'discovery' | 'square';
-export type ProductStatus = '上架' | '下架';
-
-export interface ProductItem {
-  source: ProductSource;
-  id: string;
-  title: string;
-  kind: string;
-  commercial: boolean;
-  commission: string | number | null;
-  promoType: string;
-  url: string;
-  status: ProductStatus;
-  authorName: string;
-  createdAt: string | null;
-  reason: string | null;
-}
-
-export interface ProductStats {
-  total: number;
-  commercial: number;
-  linked: number;
-  riskHigh: number;
-}
-
-export interface ProductData {
-  rows: ProductItem[];
-  stats: ProductStats;
-}
+// 类型单一来源 = modules/product-gov（与旧定义同形，结构兼容）。
+export type { ProductItem, ProductSource, ProductStatus, ProductStats };
 
 export interface ProductEditInput {
   source: ProductSource;

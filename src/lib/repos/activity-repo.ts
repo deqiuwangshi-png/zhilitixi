@@ -1,8 +1,10 @@
 // 活动上架仓储层：announcements 列表 + 新增/编辑/上架/删除写操作。
 import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
 import type { AnnouncementsRow } from '@/lib/db-types';
+import type { ActivityItem } from '@/modules/activity';
 
-export type ActivityItem = AnnouncementsRow;
+// 类型单一来源 = modules/activity（与 AnnouncementsRow 同形，结构兼容）。
+export type { ActivityItem };
 
 // 注：列表查询已迁移至 src/modules/activity/activity.queries.ts（listActivities 支持分页），
 // 旧仓储层不再保留固定 limit(100) 的全表拉取。

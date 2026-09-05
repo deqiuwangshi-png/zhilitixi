@@ -60,7 +60,6 @@ src/
 │   ├── auth-cookies.ts               # session cookie 常量与选项
 │   ├── current-user.ts               # 官网地址配置（登录 id 由 JWT 解析）
 │   ├── db-types.ts                   # 手写 Database 接口（17 表 + 6 RPC）
-│   ├── dao.ts                        # 轻量共享查询工具（fetchUserNames/groupByStatus/countRows）
 │   ├── auth/                         # 集中权限层（新代码统一入口，勿再散落 is_admin）
 │   │   ├── policy.ts                 # requirePermission / can（统一授权）
 │   │   ├── permissions.ts            # 权限名集中定义（report.read / user.ban ...）

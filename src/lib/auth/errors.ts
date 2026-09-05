@@ -10,6 +10,8 @@ export const AUTH_ERROR_CODES = {
   AUTH_USER_NOT_FOUND: 'AUTH_USER_NOT_FOUND',
   PASSWORD_INVALID: 'PASSWORD_INVALID',
   PASSWORD_UPDATE_FAILED: 'PASSWORD_UPDATE_FAILED',
+  /** 权限系统（RBAC 数据源）不可用：区别于 FORBIDDEN（确实无权限），供运维识别基础设施故障 */
+  AUTHZ_UNAVAILABLE: 'AUTHZ_UNAVAILABLE',
   INTERNAL_ERROR: 'INTERNAL_ERROR',
 } as const;
 
@@ -65,6 +67,8 @@ export function defaultMessage(code: AuthErrorCode): string {
       return '当前密码不正确';
     case AUTH_ERROR_CODES.PASSWORD_UPDATE_FAILED:
       return '密码更新失败，请稍后重试';
+    case AUTH_ERROR_CODES.AUTHZ_UNAVAILABLE:
+      return '权限系统暂时不可用，请稍后重试';
     case AUTH_ERROR_CODES.INTERNAL_ERROR:
     default:
       return '服务暂时不可用，请稍后重试';
@@ -103,6 +107,8 @@ function statusForCode(code: AuthErrorCode): number {
     case AUTH_ERROR_CODES.PASSWORD_INVALID:
       return 401;
     case AUTH_ERROR_CODES.PASSWORD_UPDATE_FAILED:
+      return 500;
+    case AUTH_ERROR_CODES.AUTHZ_UNAVAILABLE:
       return 500;
     case AUTH_ERROR_CODES.INTERNAL_ERROR:
     default:

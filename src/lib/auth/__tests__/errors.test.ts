@@ -8,6 +8,7 @@ import {
   generateRequestId,
 } from '@/lib/auth/errors';
 import { toErrorResponse } from '@/lib/auth/http';
+import { getRequestId, withRequestId } from '@/lib/request-context';
 
 const mocks = vi.hoisted(() => ({
   nextJson: vi.fn(),
@@ -108,30 +109,43 @@ describe('toErrorResponse（Route Handler 错误收敛）', () => {
     errorSpy.mockRestore();
   });
 
-  it('AuthError → 对应 code 与 status（稳定错误体）', () => {
-    toErrorResponse(new AuthError(AUTH_ERROR_CODES.AUTH_REQUIRED));
-    expect(mocks.nextJson).toHaveBeenCalledTimes(1);
-    const [body, init] = mocks.nextJson.mock.calls[0] as [
-      { error: string; code: string; requestId: string },
-      { status: number },
-    ];
-    expect(body.code).toBe('AUTH_REQUIRED');
-    expect(body.error).toBe('请先登录');
-    expect(body.requestId).toMatch(/^[a-z0-9]+-[a-z0-9]+$/);
-    expect(init.status).toBe(401);
+  it('AuthError → 对应 code 与 status（回显入口统一 requestId）', async () => {
+    await withRequestId(async (requestId) => {
+      toErrorResponse(new AuthError(AUTH_ERROR_CODES.AUTH_REQUIRED));
+      expect(mocks.nextJson).toHaveBeenCalledTimes(1);
+      const [body, init] = mocks.nextJson.mock.calls[0] as [
+        { error: string; code: string; requestId: string },
+        { status: number },
+      ];
+      expect(body.code).toBe('AUTH_REQUIRED');
+      expect(body.error).toBe('请先登录');
+      // 全链路同一 id：错误响应回显入口 withRequestId 生成的 requestId
+      expect(body.requestId).toBe(requestId);
+      expect(init.status).toBe(401);
+    });
   });
 
-  it('非 AuthError → INTERNAL_ERROR + 500，不泄露底层细节', () => {
-    toErrorResponse(new Error('secret db password leaked'));
-    expect(mocks.nextJson).toHaveBeenCalledTimes(1);
-    const [body, init] = mocks.nextJson.mock.calls[0] as [
-      { error: string; code: string; requestId: string },
-      { status: number },
-    ];
-    expect(body.code).toBe('INTERNAL_ERROR');
-    expect(body.error).toBe('服务暂时不可用，请稍后重试');
-    expect(init.status).toBe(500);
-    expect(JSON.stringify(body)).not.toContain('secret');
-    expect(errorSpy).toHaveBeenCalled();
+  it('非 AuthError → INTERNAL_ERROR + 500，不泄露底层细节', async () => {
+    await withRequestId(async (requestId) => {
+      toErrorResponse(new Error('secret db password leaked'));
+      expect(mocks.nextJson).toHaveBeenCalledTimes(1);
+      const [body, init] = mocks.nextJson.mock.calls[0] as [
+        { error: string; code: string; requestId: string },
+        { status: number },
+      ];
+      expect(body.code).toBe('INTERNAL_ERROR');
+      expect(body.error).toBe('服务暂时不可用，请稍后重试');
+      expect(init.status).toBe(500);
+      expect(JSON.stringify(body)).not.toContain('secret');
+      expect(body.requestId).toBe(requestId);
+      expect(errorSpy).toHaveBeenCalled();
+    });
+  });
+
+  it('未包裹 withRequestId 时回落 unknown（不崩溃）', () => {
+    toErrorResponse(new Error('x'));
+    const [body] = mocks.nextJson.mock.calls[0] as [{ requestId: string }];
+    expect(body.requestId).toBe('unknown');
+    expect(getRequestId()).toBeNull();
   });
 });

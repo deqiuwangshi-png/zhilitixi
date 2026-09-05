@@ -4,22 +4,10 @@
 // applyAppealAction（commands 复用）与 AppealItem 类型（旧前端组件从 @/lib/repos/
 // appeal-repo 引用）兼容，勿删仍被引用的导出。
 import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
+import type { AppealItem, AppealSource } from '@/modules/appeal';
 
-export type AppealSource = 'discovery' | 'square';
-
-export interface AppealItem {
-  source: AppealSource;
-  id: string;
-  title: string;
-  reason: string | null;
-  url: string | null;
-  content: string | null;
-  note: string | null;
-  description: string | null;
-  authorName: string;
-  /** 目前无状态存储，全部为待复核；resolved/dismissed tab 显示空态 */
-  status: 'needs_review';
-}
+// 类型单一来源 = modules/appeal（与旧定义同形，结构兼容）。
+export type { AppealItem, AppealSource };
 
 /** 申诉处理：restore 恢复发布 / dismiss 维持处罚 */
 export async function applyAppealAction(

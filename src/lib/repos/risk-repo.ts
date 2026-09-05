@@ -4,14 +4,13 @@
 // 写操作经 commands 复用本文件的 applyRiskAction。以下导出保留供旧前端组件（从
 // @/lib/repos/risk-repo 引用 RiskData）兼容，勿删仍被引用的导出。
 import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
-import type { UrlAuditRow, LinkDomainsRow, UploadAuditRow } from '@/lib/db-types';
+import type { RiskListData } from '@/modules/risk';
 
-export interface RiskData {
-  urlAudits: UrlAuditRow[];
-  domains: LinkDomainsRow[];
-  uploadAudits: UploadAuditRow[];
-  userNames: Record<string, string>;
-}
+// 类型单一来源 = modules/risk（RiskData 取 RiskListData 的基础四字段，结构兼容）。
+export type RiskData = Pick<
+  RiskListData,
+  'urlAudits' | 'domains' | 'uploadAudits' | 'userNames'
+>;
 
 export interface RiskActionInput {
   type: 'domain' | 'url' | 'upload';

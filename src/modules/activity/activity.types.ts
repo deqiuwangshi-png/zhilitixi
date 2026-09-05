@@ -41,3 +41,9 @@ export interface ActivityPageResult<T> {
   pageSize: number;
   totalPages: number;
 }
+
+/** 顶部统计卡数据（数据库全量 count，杜绝基于有界列表的内存统计少算） */
+export interface ActivityStatsData {
+  total: number;
+  active: number;
+}

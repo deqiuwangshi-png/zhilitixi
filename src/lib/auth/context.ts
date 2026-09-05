@@ -31,16 +31,17 @@ export function filterGrantedPermissions(grantedIds: readonly string[]): readonl
  * 从数据库读取用户实际权限：user_roles → role_permissions → permissions。
  * 仅返回 permissions.ts 定义内存在、且被授权给该用户的权限。
  *
- * fail-closed：任一查询失败（异常）均视为无权限，返回空权限集（console.error 留痕，
- * 不向页面抛出）；页面 / Server Action 的 requirePermission 因此抛 FORBIDDEN。
- * 注意：RBAC 迁移（006）未落地时，登录管理员查不到 user_roles 角色，
- * 同样获得空权限集（FORBIDDEN）——这是预期的安全行为，不是回退。
- * （导出仅为单测：覆盖过滤边界与 fail-closed 语义。）
+ * 语义区分（fail-closed，但不静默）：
+ * - 查询成功但用户无角色 / 无权限授予 → 空权限集；requirePermission 抛 FORBIDDEN（确实无权限）。
+ * - 查询异常（RBAC 数据源不可用）→ 抛 AUTHZ_UNAVAILABLE（基础设施故障，与「确实无权限」可区分，
+ *   运维可从错误码识别权限系统故障；对外文案仍不含数据库细节，详情走 console.error 留痕）。
+ * 注意：RBAC 迁移（006）未落地时查询会异常 → AUTHZ_UNAVAILABLE，这是预期的安全行为，不是回退。
+ * （导出仅为单测：覆盖过滤边界与故障语义。）
  */
 export async function loadUserPermissions(userId: string): Promise<readonly Permission[]> {
   try {
     // 读取走 RLS 用户客户端（当前请求管理员 token）；RBAC 表 006 的 *_admin_all 策略放行
-    // 管理员读取，fail-closed 语义不变（异常 → 空权限）。
+    // 管理员读取，fail-closed 语义不变（异常 → AUTHZ_UNAVAILABLE）。
     const client = await getSessionRlsClient();
     const { data: membership } = await client.from('user_roles').select('role_id').eq('user_id', userId);
     const roleIds = (membership ?? []).map((r) => r.role_id);
@@ -56,17 +57,17 @@ export async function loadUserPermissions(userId: string): Promise<readonly Perm
     const { data: permRows } = await client.from('permissions').select('id').in('id', permIds);
     return filterGrantedPermissions((permRows ?? []).map((p) => p.id));
   } catch (error) {
-    // RBAC 异常即拒绝：权限解析失败一律按无权限处理（fail-closed），不向页面抛出。
-    console.error('[auth] 加载用户权限失败，按空权限（fail-closed）处理：', error);
-    return [];
+    // RBAC 数据源异常：区别于「确实无权限」，抛 AUTHZ_UNAVAILABLE（对外不含数据库细节）。
+    console.error('[auth] 加载用户权限失败（权限系统不可用）：', error);
+    throw new AuthError(AUTH_ERROR_CODES.AUTHZ_UNAVAILABLE);
   }
 }
 
 /**
  * 解析当前请求的认证上下文。
  * 未登录 / 非管理员返回 null；管理员按其数据库角色/权限返回。
- * fail-closed：RBAC 迁移（006）未落地或权限解析异常时，管理员权限集为空，
- * 任何 requirePermission 均抛 FORBIDDEN（而非回退为全量权限）。
+ * fail-closed：无角色/无授予 → 空权限集（requirePermission 抛 FORBIDDEN）；
+ * RBAC 数据源异常 → AUTHZ_UNAVAILABLE 向上传播（与 FORBIDDEN 可区分，均不回退为全量权限）。
  */
 export async function getAuthContext(): Promise<AuthContext | null> {
   const admin = await getCurrentAdmin();

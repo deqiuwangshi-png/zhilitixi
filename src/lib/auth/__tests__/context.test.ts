@@ -103,10 +103,14 @@ describe('loadUserPermissions（fail-closed 语义）', () => {
     await expect(loadUserPermissions('user-1')).resolves.toEqual([]);
   });
 
-  it('查询抛错 → 空权限集（异常即拒绝，不向调用方抛出）', async () => {
+  it('查询抛错 → 抛 AUTHZ_UNAVAILABLE（权限系统故障，与「确实无权限」可区分）', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     mocks.getSessionRlsClient.mockRejectedValue(new Error('db down'));
-    await expect(loadUserPermissions('user-1')).resolves.toEqual([]);
+    await expect(loadUserPermissions('user-1')).rejects.toMatchObject({
+      code: AUTH_ERROR_CODES.AUTHZ_UNAVAILABLE,
+      status: 500,
+    });
+    await expect(loadUserPermissions('user-1')).rejects.toBeInstanceOf(AuthError);
     expect(errorSpy).toHaveBeenCalled();
     errorSpy.mockRestore();
   });

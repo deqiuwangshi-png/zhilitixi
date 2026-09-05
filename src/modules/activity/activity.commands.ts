@@ -1,6 +1,5 @@
 // 活动上架模块：命令层（写操作）。
 // 授权 → zod 校验 → 落库，失败抛稳定 AuthError（不暴露 Supabase 原始错误）。
-import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
 import { AuthError, AUTH_ERROR_CODES } from '@/lib/auth/errors';
 import {
   saveActivity as repoSaveActivity,

@@ -3,12 +3,17 @@
 // 治理动作走 apply_governance_action 事务 RPC（更新治理列 + 处罚流水 + 审计日志）。
 import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
 import { AuthError, AUTH_ERROR_CODES } from '@/lib/auth/errors';
+import { getRequestId } from '@/lib/request-context';
 import { requireUserBan, requireUserEdit } from './users.policy';
 import { editUserSchema, govActionSchema, type EditUserInput, type GovActionInput } from './users.schema';
 
-/** 请求幂等键；未提供时为 null，由数据库 RPC 内部生成。 */
+/**
+ * RPC 幂等/审计键：显式传入优先，否则取请求上下文统一生成的 requestId
+ * （入口 withRequestId 包裹后自动贯穿到审计日志）；两者均无则交数据库 RPC 内部生成。
+ */
 function toRpcRequestId(requestId?: string): string | null {
-  return requestId && requestId.length > 0 ? requestId : null;
+  const id = requestId ?? getRequestId();
+  return id && id.length > 0 ? id : null;
 }
 
 /** 事务 RPC：同一数据库事务内更新治理状态 + 处罚流水 + 审计日志 */

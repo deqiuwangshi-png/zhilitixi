@@ -11,10 +11,12 @@ export interface NotificationItem {
   createdAt: string | null;
 }
 
-/** 当前用户通知列表（未读优先，最多 20 条） */
+/** 当前用户通知列表（未读优先，最近 20 条有界预览，非全量） */
 export async function listNotifications(userId: string): Promise<NotificationItem[]> {
   // 读取走 RLS 用户客户端（当前请求 token）；notifications 表 011 已启用 RLS（本人读 / 管理员读），
   // 此处按 userId 过滤与 RLS 双重收敛，service-role 仅保留写路径。
+  // 顶栏面板为"最近通知"预览，天然有界（20 条）；后续模块化时如需全量分页，
+  // 再在 modules/notifications 内提供 count+range 列表，勿在此扩成全表拉取。
   const client = await getSessionRlsClient();
   const { data, error } = await client
     .from('notifications')

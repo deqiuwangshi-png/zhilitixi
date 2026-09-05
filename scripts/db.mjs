@@ -191,6 +191,7 @@ const RPC_SIGS = {
 const RLS_TABLES = [
   'users', 'governance_penalties', 'reports', 'url_audit', 'upload_audit', 'verifications',
   'permissions', 'roles', 'role_permissions', 'governance_scopes', 'user_roles', 'audit_logs',
+  'notifications', 'announcements', 'link_domains',
 ];
 
 function buildCheckSQL() {
@@ -202,6 +203,7 @@ function buildCheckSQL() {
   for (const [name, sig] of Object.entries(RPC_SIGS)) {
     rows.push(`('rpc:${name}:exists', to_regprocedure('${sig}') IS NOT NULL, COALESCE(to_regprocedure('${sig}')::text, 'missing: ${sig}'))`);
     rows.push(`('rpc:${name}:no_anon_exec', NOT has_function_privilege('anon', '${sig}', 'EXECUTE'), 'anon EXECUTE ${name}')`);
+    rows.push(`('rpc:${name}:no_auth_exec', NOT has_function_privilege('authenticated', '${sig}', 'EXECUTE'), 'authenticated EXECUTE ${name}')`);
     rows.push(`('rpc:${name}:no_public_exec', NOT has_function_privilege('public', '${sig}', 'EXECUTE'), 'public EXECUTE ${name}')`);
   }
   for (const t of RLS_TABLES)
@@ -215,7 +217,7 @@ function printChecksIntro() {
   for (const v of VIEWS) console.log(`   - union 视图存在 (008/009)：public.${v}`);
   for (const name of Object.keys(RPC_SIGS)) {
     console.log(`   - 事务 RPC 存在 (007/010)：${name}`);
-    console.log(`     - EXECUTE 未授予 anon（仅 service_role）`);
+    console.log(`     - EXECUTE 未授予 anon / authenticated（仅 service_role）`);
     console.log(`     - EXECUTE 未授予 public（仅 service_role）`);
   }
   for (const t of RLS_TABLES) console.log(`   - 核心表已启用 RLS：public.${t}`);

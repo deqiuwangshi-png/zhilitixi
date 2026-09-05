@@ -1,15 +1,12 @@
 import type { AuthData } from '@/lib/repos/auth-repo';
 
-/** 顶部 4 项统计卡（服务端计算） */
+/** 顶部 4 项统计卡（服务端计算，统计为数据库全量 count） */
 export function AuthStats({ data }: { data: AuthData }) {
-  const pending = data.verifications.filter((v) => v.status === 'pending').length;
-  const approved = data.verifications.filter((v) => v.status === 'approved').length;
-
   return (
     <div className="grid grid-cols-4 gap-4">
-      <Stat label="认证申请" value={data.verifications.length} tone="text-[#1F2329]" />
-      <Stat label="待审核" value={pending} tone="text-[#FF8800]" />
-      <Stat label="已通过" value={approved} tone="text-[#00A870]" />
+      <Stat label="认证申请" value={data.totalVerifications} tone="text-[#1F2329]" />
+      <Stat label="待审核" value={data.pendingCount} tone="text-[#FF8800]" />
+      <Stat label="已通过" value={data.approvedCount} tone="text-[#00A870]" />
       <Stat label="注册用户" value={data.totalUsers} tone="text-[#1F2329]" />
     </div>
   );

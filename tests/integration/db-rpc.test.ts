@@ -221,6 +221,12 @@ dbDescribe('真实库集成（DATABASE_URL）', () => {
         await expect(client!.query('SELECT * FROM public.permissions LIMIT 1')).rejects.toThrow(
           /permission denied/i,
         );
+        await expect(client!.query('SELECT * FROM public.announcements LIMIT 1')).rejects.toThrow(
+          /permission denied/i,
+        );
+        await expect(client!.query('SELECT * FROM public.link_domains LIMIT 1')).rejects.toThrow(
+          /permission denied/i,
+        );
       } finally {
         await client!.query('RESET ROLE');
       }
@@ -235,6 +241,10 @@ dbDescribe('真实库集成（DATABASE_URL）', () => {
         expect((penalties.rows[0] as { n: number }).n).toBe(0);
         const audit = await client!.query('SELECT count(*)::int AS n FROM public.audit_logs');
         expect((audit.rows[0] as { n: number }).n).toBe(0);
+        const anns = await client!.query('SELECT count(*)::int AS n FROM public.announcements');
+        expect((anns.rows[0] as { n: number }).n).toBe(0);
+        const links = await client!.query('SELECT count(*)::int AS n FROM public.link_domains');
+        expect((links.rows[0] as { n: number }).n).toBe(0);
       } finally {
         await client!.query('RESET ROLE');
       }
@@ -242,18 +252,22 @@ dbDescribe('真实库集成（DATABASE_URL）', () => {
   });
 
   describe('事务 RPC 授权面', () => {
-    it('apply_governance_action / edit_user_profile_and_role 未授予 anon 与 public EXECUTE', async () => {
+    it('apply_governance_action / edit_user_profile_and_role 未授予 anon、authenticated 与 public EXECUTE', async () => {
       const r = await client!.query(
         `SELECT
            has_function_privilege('anon', 'public.apply_governance_action(uuid,text,text,uuid,text,timestamptz)', 'EXECUTE') AS anon_gov,
+           has_function_privilege('authenticated', 'public.apply_governance_action(uuid,text,text,uuid,text,timestamptz)', 'EXECUTE') AS auth_gov,
            has_function_privilege('public', 'public.apply_governance_action(uuid,text,text,uuid,text,timestamptz)', 'EXECUTE') AS public_gov,
            has_function_privilege('anon', 'public.edit_user_profile_and_role(uuid,text,text,int,text,uuid,text)', 'EXECUTE') AS anon_edit,
+           has_function_privilege('authenticated', 'public.edit_user_profile_and_role(uuid,text,text,int,text,uuid,text)', 'EXECUTE') AS auth_edit,
            has_function_privilege('public', 'public.edit_user_profile_and_role(uuid,text,text,int,text,uuid,text)', 'EXECUTE') AS public_edit`,
       );
       expect(r.rows[0]).toEqual({
         anon_gov: false,
+        auth_gov: false,
         public_gov: false,
         anon_edit: false,
+        auth_edit: false,
         public_edit: false,
       });
     });
