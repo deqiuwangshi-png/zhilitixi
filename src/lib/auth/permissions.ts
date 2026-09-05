@@ -20,6 +20,15 @@ export const Permissions = {
   // 商品治理
   productRead: 'product.read',
   productManage: 'product.manage',
+  // 侵权与申诉
+  appealRead: 'appeal.read',
+  appealManage: 'appeal.manage',
+  // 风控中心
+  riskRead: 'risk.read',
+  riskManage: 'risk.manage',
+  // 规则与处罚（复用 rule.manage，无独立读写拆分）
+  // 治理总览（纯只读）
+  overviewRead: 'overview.read',
 } as const;
 
 export type Permission = (typeof Permissions)[keyof typeof Permissions];

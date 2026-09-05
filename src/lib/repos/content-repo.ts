@@ -3,7 +3,7 @@
 // 模块导入（listContent / reviewItem / batchReviewItems）。本文件导出仍被
 // components/features/review/review-table.tsx（ContentItem 类型）引用，故保留不动，
 // 仅供兼容；listContent / applyReview 已不再被业务入口调用。
-import { getSupabaseClient } from '@/storage/database/supabase-client';
+import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
 import type { ReviewActionInput } from '@/lib/validations/review.schema';
 
 export type ContentSource = 'discovery' | 'square' | 'url';
@@ -25,7 +25,7 @@ export interface ContentItem {
 
 /** 合并三表为统一审核行（状态判定：discovery.reason / square.url_status / url.risk） */
 export async function listContent(): Promise<ContentItem[]> {
-  const client = getSupabaseClient();
+  const client = getSupabasePrivilegedClient();
   const [{ data: d }, { data: s }, { data: u }] = await Promise.all([
     client.from('discoveries').select('*').order('created_at', { ascending: false }).limit(100),
     client.from('square_posts').select('*').order('created_at', { ascending: false }).limit(100),
@@ -104,7 +104,7 @@ export async function listContent(): Promise<ContentItem[]> {
 
 /** 审核写操作（单条，供 SA 调用）：写 review_status + 维持 reason/url_status 语义 */
 export async function applyReview(input: ReviewActionInput): Promise<void> {
-  const client = getSupabaseClient();
+  const client = getSupabasePrivilegedClient();
   const { source, id, action, reason } = input;
 
   if (source === 'discovery') {

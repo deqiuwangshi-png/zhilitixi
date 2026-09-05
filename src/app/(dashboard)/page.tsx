@@ -1,5 +1,4 @@
-import { requireAdmin } from '@/lib/auth';
-import { getOverviewData } from '@/lib/repos/overview-repo';
+import { requireOverviewRead, getOverviewData, toOverviewRange } from '@/modules/overview';
 import { StatCards } from '@/components/features/overview/stat-cards';
 import { TrendPanel } from '@/components/features/overview/trend-panel';
 import { PenaltyDist } from '@/components/features/overview/penalty-dist';
@@ -8,17 +7,17 @@ import { RiskUsers } from '@/components/features/overview/risk-users';
 
 export const dynamic = 'force-dynamic';
 
-// 治理总览首页（RSC：服务端直查 repo，零客户端 fetch）
+// 治理总览首页（RSC：服务端直查模块 queries，零客户端 fetch；纯只读 overview.read）
 export default async function OverviewPage({
   searchParams,
 }: {
   searchParams: Promise<{ range?: string }>;
 }) {
   const params = await searchParams;
-  await requireAdmin();
+  await requireOverviewRead();
 
   const data = await getOverviewData();
-  const range: '7' | '30' = params.range === '30' ? '30' : '7';
+  const range = toOverviewRange({ range: params.range });
   const trend = range === '7' ? data.trend7 : data.trend30;
 
   return (

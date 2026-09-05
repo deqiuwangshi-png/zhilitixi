@@ -1,4 +1,4 @@
-import { getSupabaseClient } from '@/storage/database/supabase-client';
+import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
 import type { Database } from '@/lib/db-types';
 
 /**
@@ -7,7 +7,7 @@ import type { Database } from '@/lib/db-types';
  */
 
 export function db() {
-  return getSupabaseClient();
+  return getSupabasePrivilegedClient();
 }
 
 /** 拉取用户 id -> name 映射，用于列表联表展示 */

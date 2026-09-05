@@ -1,6 +1,6 @@
 // 活动上架模块：查询层（数据访问）。
 // 分页/筛选/total 全部在数据库完成，使用 count:'exact'；kind/q 下沉到 where。
-import { getSupabaseClient } from '@/storage/database/supabase-client';
+import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
 import { rowToDto } from './activity.mapper';
 import { DEFAULT_PAGE_SIZE, SIZES } from './activity.schema';
 import type { ActivityItem, ActivityListQuery, ActivityPageResult, ActivityRowData } from './activity.types';
@@ -21,7 +21,7 @@ export async function listActivities(query: ActivityListQuery): Promise<Activity
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  const client = getSupabaseClient();
+  const client = getSupabasePrivilegedClient();
   let builder = client
     .from('announcements')
     .select(LIST_COLS, { count: 'exact' })
@@ -51,7 +51,7 @@ export async function listActivities(query: ActivityListQuery): Promise<Activity
 
 /** 全量活动（供顶部统计卡：总数 / 上架中 / 已下线），与旧 activity-repo.listActivities 行为一致 */
 export async function listAllActivities(): Promise<ActivityItem[]> {
-  const { data, error } = await getSupabaseClient()
+  const { data, error } = await getSupabasePrivilegedClient()
     .from('announcements')
     .select(LIST_COLS)
     .order('sort', { ascending: true })

@@ -40,7 +40,7 @@ export function UserEditDrawer({ user, onClose }: Props) {
   return (
     <div className="fixed inset-0 z-50">
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-      <div className="absolute inset-y-0 right-0 flex w-[480px] max-w-full flex-col bg-white" style={{ animation: 'drawerIn 0.25s ease-out' }}>
+      <div className="absolute inset-y-0 right-0 flex w-[480px] max-w-full flex-col bg-white" style={{ animation: 'drawer-in 0.25s ease-out' }}>
         <div className="flex h-14 items-center justify-between border-b border-[#E5E6EB] px-5">
           <h2 className="text-base font-semibold text-[#1F2329]">编辑用户资料</h2>
           <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-md text-[#646A73] transition-colors hover:bg-[#F8FAFC] hover:text-[#1F2329]">

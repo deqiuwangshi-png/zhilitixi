@@ -29,8 +29,8 @@ export function SettingsDrawer({ onClose }: { onClose: () => void }) {
 
   return (
     <>
-      <div className="fixed inset-0 z-40 bg-black/40" style={{ animation: 'fadeIn 200ms ease-out' }} onClick={onClose} />
-      <div className="fixed right-0 top-0 z-50 flex h-full w-[480px] flex-col bg-white ring-1 ring-[#E5E6EB]" style={{ animation: 'drawerIn 250ms ease-out' }}>
+      <div className="fixed inset-0 z-40 bg-black/40" style={{ animation: 'fade-in 200ms ease-out' }} onClick={onClose} />
+      <div className="fixed right-0 top-0 z-50 flex h-full w-[480px] flex-col bg-white ring-1 ring-[#E5E6EB]" style={{ animation: 'drawer-in 250ms ease-out' }}>
         <div className="border-b border-[#E5E6EB] px-6 py-4">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-semibold text-[#1F2329]">系统设置</h2>

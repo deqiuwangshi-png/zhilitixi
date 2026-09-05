@@ -1,6 +1,6 @@
 // 举报处理模块：命令层（写操作）。
 // 授权 → 写回 reports.status（approve→approved / reject→rejected），失败抛稳定 Error。
-import { getSupabaseClient } from '@/storage/database/supabase-client';
+import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
 import { AuthError, AUTH_ERROR_CODES } from '@/lib/auth/errors';
 import { requireReportModerate } from './report.policy';
 import type { ReportAction } from './report.types';
@@ -11,7 +11,7 @@ export async function applyReportAction(id: string, action: ReportAction): Promi
   await requireReportModerate(action);
 
   const status = action === 'approve' ? 'approved' : 'rejected';
-  const { error } = await getSupabaseClient().from('reports').update({ status }).eq('id', id);
+  const { error } = await getSupabasePrivilegedClient().from('reports').update({ status }).eq('id', id);
   if (error) {
     // 稳定文案对外；原始错误只落日志
     console.error('[report] applyReportAction failed:', error.message);

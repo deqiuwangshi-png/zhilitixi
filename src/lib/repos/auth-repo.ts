@@ -1,5 +1,5 @@
 // 用户认证仓储层：认证申请列表（联表用户名）+ 审核写操作。
-import { getSupabaseClient } from '@/storage/database/supabase-client';
+import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
 
 export type VerificationStatus = 'pending' | 'approved' | 'rejected';
 
@@ -20,7 +20,7 @@ export interface AuthData {
 
 /** 认证申请列表 + 注册用户总数 */
 export async function listAuthData(): Promise<AuthData> {
-  const client = getSupabaseClient();
+  const client = getSupabasePrivilegedClient();
   const [{ data: verifications }, { count: totalUsers }] = await Promise.all([
     client.from('verifications').select('*').order('created_at', { ascending: false }).limit(200),
     client.from('users').select('id', { count: 'exact', head: true }),
@@ -52,6 +52,6 @@ export async function listAuthData(): Promise<AuthData> {
 /** 审核认证申请：写回 verifications.status（approve→approved / reject→rejected） */
 export async function applyVerification(id: string, action: 'approve' | 'reject'): Promise<void> {
   const status = action === 'approve' ? 'approved' : 'rejected';
-  const { error } = await getSupabaseClient().from('verifications').update({ status }).eq('id', id);
+  const { error } = await getSupabasePrivilegedClient().from('verifications').update({ status }).eq('id', id);
   if (error) throw new Error(`applyVerification failed: ${error.message}`);
 }

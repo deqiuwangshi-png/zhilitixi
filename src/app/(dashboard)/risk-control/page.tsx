@@ -1,5 +1,4 @@
-import { requireAdmin } from '@/lib/auth';
-import { listRiskData } from '@/lib/repos/risk-repo';
+import { requireRiskRead, listRiskData, type RiskListQuery } from '@/modules/risk';
 import { RiskStats } from '@/components/features/risk-control/risk-stats';
 import { RiskTabs, type RiskTab } from '@/components/features/risk-control/risk-tabs';
 import { RiskClient } from '@/components/features/risk-control/risk-client';
@@ -10,33 +9,27 @@ export interface RiskPageParams {
   page?: string;
 }
 
-const PAGE_SIZE = 20;
 const validTabs: RiskTab[] = ['url', 'domain', 'upload'];
 
 export const dynamic = 'force-dynamic';
 
-// 风控中心（RSC：统计卡服务端计算 + tab/搜索/分页 URL 化，零客户端 fetch）
+// 风控中心（RSC：统计卡服务端计算 + tab/搜索/分页 URL 化，domain tab 为 DB 分页，零客户端 fetch）
 export default async function RiskControlPage({
   searchParams,
 }: {
   searchParams: Promise<RiskPageParams>;
 }) {
   const params = await searchParams;
-  await requireAdmin();
+  await requireRiskRead();
 
-  const data = await listRiskData();
+  const query: RiskListQuery = {
+    tab: params.tab,
+    q: params.q?.trim() || undefined,
+    page: Math.max(1, Number(params.page) || 1),
+    pageSize: 20,
+  };
+  const data = await listRiskData(query);
   const tab: RiskTab = (params.tab as RiskTab) && validTabs.includes(params.tab as RiskTab) ? (params.tab as RiskTab) : 'domain';
-
-  // domain tab：服务端搜索 + 分页
-  let domains = data.domains;
-  if (params.q?.trim()) {
-    const q = params.q.trim().toLowerCase();
-    domains = domains.filter((d) => d.domain.toLowerCase().includes(q) || (d.note ?? '').toLowerCase().includes(q));
-  }
-  const page = Math.max(1, Number(params.page) || 1);
-  const totalPages = Math.max(1, Math.ceil(domains.length / PAGE_SIZE));
-  const safePage = Math.min(page, totalPages);
-  const pagedDomains = domains.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   return (
     <div className="space-y-4">
@@ -49,12 +42,12 @@ export default async function RiskControlPage({
         <RiskClient
           tab={tab}
           urlAudits={data.urlAudits}
-          domains={tab === 'domain' ? pagedDomains : data.domains}
+          domains={data.pageDomains}
           uploadAudits={data.uploadAudits}
           userNames={data.userNames}
           q={params.q ?? ''}
-          page={safePage}
-          totalPages={totalPages}
+          page={data.page}
+          totalPages={data.totalPages}
         />
       </div>
     </div>

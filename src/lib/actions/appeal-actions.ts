@@ -2,9 +2,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { requireAdmin } from '@/lib/auth';
-import { applyAppealAction } from '@/lib/repos/appeal-repo';
-import { appealActionSchema, type AppealActionInput } from '@/lib/validations/appeal.schema';
+import { applyAppeal, type AppealActionInput } from '@/modules/appeal';
 
 export interface ActionResult {
   ok: boolean;
@@ -18,10 +16,7 @@ function toError(e: unknown): string {
 /** 申诉处理（恢复发布 / 维持处罚） */
 export async function handleAppeal(input: AppealActionInput): Promise<ActionResult> {
   try {
-    await requireAdmin();
-    const parsed = appealActionSchema.safeParse(input);
-    if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '输入不合法' };
-    await applyAppealAction(parsed.data.source, parsed.data.id, parsed.data.action);
+    await applyAppeal(input);
     revalidatePath('/infringement');
     return { ok: true };
   } catch (e) {

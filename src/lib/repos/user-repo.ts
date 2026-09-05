@@ -1,7 +1,7 @@
 // 用户管理仓储层：唯一数据访问入口（用户列表 / 治理详情 / 治理操作落库 + 处罚流水）。
 // TODO: 业务逻辑已迁移至 src/modules/users（types/schema/policy/mapper/queries/commands），
 // 本文件导出仍被 components/features/users/* 与 user-actions 历史引用，保留以兼容，勿删。
-import { getSupabaseClient } from '@/storage/database/supabase-client';
+import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
 import type { UsersRow } from '@/lib/db-types';
 
 /** 请求幂等键；未提供时为 null，由数据库 RPC 内部生成。 */
@@ -68,7 +68,7 @@ function mapRow(u: UserRowData): UserListItem {
 
 /** 用户列表（含治理字段） */
 export async function listUsers(): Promise<UserListItem[]> {
-  const { data, error } = await getSupabaseClient()
+  const { data, error } = await getSupabasePrivilegedClient()
     .from('users')
     .select(LIST_COLS)
     .order('created_at', { ascending: false });
@@ -80,7 +80,7 @@ export async function listUsers(): Promise<UserListItem[]> {
  * TODO: 分页待下沉——目前固定 limit(500)，并非“全量”，仅覆盖列表查看的最近流水；
  * 后续治理处罚流水应支持数据库分页，替换此处有界拉取。modules/users 亦复用本实现。 */
 export async function listPenaltiesGrouped(): Promise<Record<string, PenaltyRecord[]>> {
-  const client = getSupabaseClient();
+  const client = getSupabasePrivilegedClient();
   const { data, error } = await client
     .from('governance_penalties')
     .select('id,user_id,action,reason,operator_id,created_at')
@@ -119,7 +119,7 @@ async function appendPenalty(
   reason: string,
   operatorId: string
 ): Promise<void> {
-  const { error } = await getSupabaseClient().from('governance_penalties').insert({
+  const { error } = await getSupabasePrivilegedClient().from('governance_penalties').insert({
     user_id: userId,
     action,
     reason: reason || '',
@@ -136,7 +136,7 @@ async function applyGovernanceActionViaRpc(
   operatorId: string,
   requestId?: string
 ): Promise<void> {
-  const { error } = await getSupabaseClient().rpc('apply_governance_action', {
+  const { error } = await getSupabasePrivilegedClient().rpc('apply_governance_action', {
     p_user_id: id,
     p_action: action,
     p_reason: reason,
@@ -157,19 +157,23 @@ export async function applyGovAction(
   await applyGovernanceActionViaRpc(id, action, reason, operatorId, requestId);
 }
 
-/** 角色调整：更新治理列 + 写流水 */
+/** 角色调整：更新治理列 + 写流水。
+ * TODO: 已弃用（两步独立写，非单事务）——现由 edit_user_profile_and_role 事务 RPC 取代
+ * （见 modules/users/users.commands.ts）。本导出仅保留以兼容历史引用，勿在新代码调用。 */
 export async function setUserRole(
   id: string,
   role: GovRole,
   reason: string,
   operatorId: string
 ): Promise<void> {
-  const { error } = await getSupabaseClient().from('users').update({ gov_role: role }).eq('id', id);
+  const { error } = await getSupabasePrivilegedClient().from('users').update({ gov_role: role }).eq('id', id);
   if (error) throw new Error(`setUserRole failed: ${error.message}`);
   await appendPenalty(id, 'role_change', reason || `角色调整为${role === 'moderator' ? '版主' : '普通用户'}`, operatorId);
 }
 
-/** 编辑基础资料（name/points/badge 写回主库） */
+/** 编辑基础资料（name/points/badge 写回主库）。
+ * TODO: 已弃用（两步独立写，非单事务）——现由 edit_user_profile_and_role 事务 RPC 取代
+ * （见 modules/users/users.commands.ts）。本导出仅保留以兼容历史引用，勿在新代码调用。 */
 export async function editUserProfile(
   id: string,
   patch: { name?: string; points?: number; badge?: string },
@@ -181,7 +185,7 @@ export async function editUserProfile(
   if (typeof patch.badge === 'string') p.badge = patch.badge;
   if (Object.keys(p).length === 0) return;
 
-  const { error } = await getSupabaseClient().from('users').update(p).eq('id', id);
+  const { error } = await getSupabasePrivilegedClient().from('users').update(p).eq('id', id);
   if (error) throw new Error(`editUserProfile failed: ${error.message}`);
   await appendPenalty(id, 'edit', '编辑基础资料', operatorId);
 }

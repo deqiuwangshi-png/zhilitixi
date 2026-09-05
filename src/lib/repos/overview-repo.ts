@@ -1,5 +1,8 @@
 // 治理总览仓储层：首页全部统计的真实查询（类型化，替代旧 /api/overview 的散落逻辑）。
-import { getSupabaseClient } from '@/storage/database/supabase-client';
+// TODO(阶段六): getOverviewData 已迁移至 src/modules/overview/overview.queries.ts（聚合/
+// 映射逻辑下沉 overview.mapper 纯函数，计数下推 DB count:'exact'）。以下导出保留供旧
+// 前端组件（从 @/lib/repos/overview-repo 引用各 DTO 类型）兼容，勿删仍被引用的导出。
+import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
 import { fetchUserNames } from '@/lib/dao';
 import type { ReportsRow, UrlAuditRow } from '@/lib/db-types';
 
@@ -51,7 +54,7 @@ export interface OverviewData {
 }
 
 export async function getOverviewData(): Promise<OverviewData> {
-  const client = getSupabaseClient();
+  const client = getSupabasePrivilegedClient();
 
   // === 举报数据 ===
   const { data: reports } = await client.from('reports').select('*').limit(5000);

@@ -1,5 +1,5 @@
 // 消息通知仓储层：当前用户通知列表 + 已读操作（notifications 表）。
-import { getSupabaseClient } from '@/storage/database/supabase-client';
+import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
 
 export interface NotificationItem {
   id: string;
@@ -12,7 +12,7 @@ export interface NotificationItem {
 
 /** 当前用户通知列表（未读优先，最多 20 条） */
 export async function listNotifications(userId: string): Promise<NotificationItem[]> {
-  const { data, error } = await getSupabaseClient()
+  const { data, error } = await getSupabasePrivilegedClient()
     .from('notifications')
     .select('id,type,title,content,read,created_at')
     .eq('user_id', userId)
@@ -31,7 +31,7 @@ export async function listNotifications(userId: string): Promise<NotificationIte
 
 /** 单条标记已读 */
 export async function markNotificationRead(id: string): Promise<void> {
-  const { error } = await getSupabaseClient()
+  const { error } = await getSupabasePrivilegedClient()
     .from('notifications')
     .update({ read: true })
     .eq('id', id);
@@ -40,7 +40,7 @@ export async function markNotificationRead(id: string): Promise<void> {
 
 /** 当前用户全部标记已读 */
 export async function markAllNotificationsRead(userId: string): Promise<void> {
-  const { error } = await getSupabaseClient()
+  const { error } = await getSupabasePrivilegedClient()
     .from('notifications')
     .update({ read: true })
     .eq('user_id', userId)

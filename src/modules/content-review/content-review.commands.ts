@@ -2,14 +2,14 @@
 // 授权（policy）→ 校验（zod）→ 落库；失败抛稳定 AuthError，不暴露 Supabase 原始错误。
 // 三表分别写各自审核栏位（review_status / url_status / risk），单条写不涉及用户治理状态，
 // 无需 apply_governance_action 事务 RPC。
-import { getSupabaseClient } from '@/storage/database/supabase-client';
+import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
 import { AuthError, AUTH_ERROR_CODES } from '@/lib/auth/errors';
 import { requireReviewApply } from './content-review.policy';
 import { reviewActionSchema, type ReviewActionInput } from './content-review.schema';
 
 /** 单条审核写库（按内容来源路由到对应表；写错抛稳定 AuthError） */
 async function applyReviewWrite(input: ReviewActionInput): Promise<void> {
-  const client = getSupabaseClient();
+  const client = getSupabasePrivilegedClient();
   const { source, id, action, reason } = input;
 
   if (source === 'discovery') {

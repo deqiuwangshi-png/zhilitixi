@@ -56,7 +56,7 @@ export function ActivityDrawer({ mode, item, onClose }: Props) {
   return (
     <>
       <div className="fixed inset-0 z-40 bg-black/30" onClick={onClose} />
-      <div className="fixed inset-y-0 right-0 z-50 flex w-[480px] flex-col bg-white" style={{ animation: 'drawerIn .25s ease-out' }}>
+      <div className="fixed inset-y-0 right-0 z-50 flex w-[480px] flex-col bg-white" style={{ animation: 'drawer-in .25s ease-out' }}>
         <div className="flex items-center justify-between border-b border-[#F0F1F3] px-5 py-4">
           <div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-[#006855]" />

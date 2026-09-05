@@ -77,7 +77,7 @@ export function AppealClient({ appeals }: { appeals: AppealItem[] }) {
       {selected && (
         <div className="fixed inset-0 z-50 flex justify-end">
           <div className="absolute inset-0 bg-black/40" onClick={() => setSelected(null)} />
-          <div className="relative flex h-full w-[480px] flex-col bg-white shadow-none" style={{ animation: 'drawerIn .25s ease-out' }}>
+          <div className="relative flex h-full w-[480px] flex-col bg-white shadow-none" style={{ animation: 'drawer-in .25s ease-out' }}>
             <div className="flex h-14 items-center justify-between border-b border-[#E5E6EB] px-5">
               <span className="text-[15px] font-semibold text-[#1F2329]">申诉详情</span>
               <button onClick={() => setSelected(null)} className="rounded-md p-1 text-[#646A73] transition-colors hover:bg-[#F7F8FA]" aria-label="关闭">

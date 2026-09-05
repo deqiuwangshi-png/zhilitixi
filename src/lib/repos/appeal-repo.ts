@@ -1,5 +1,9 @@
 // 侵权与申诉仓储层：被标记内容（discoveries.reason / square_posts.blocked）合并 + 申诉处理。
-import { getSupabaseClient } from '@/storage/database/supabase-client';
+// TODO(阶段六): listAppeals 已迁移至 src/modules/appeal/appeal.queries.ts（DB union 视图
+// v_appeal_catalog：全局 count + order，不再固定 limit(100) 合并），写操作经 commands
+// 复用本文件的 applyAppealAction。以下导出保留供旧前端组件（从 @/lib/repos/appeal-repo
+// 引用 AppealItem）兼容，勿删仍被引用的导出。
+import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
 
 export type AppealSource = 'discovery' | 'square';
 
@@ -19,7 +23,7 @@ export interface AppealItem {
 
 /** 申诉案件列表：discoveries(reason 非空) + square_posts(blocked)，带真实 source */
 export async function listAppeals(): Promise<AppealItem[]> {
-  const client = getSupabaseClient();
+  const client = getSupabasePrivilegedClient();
   const [{ data: discoveries }, { data: squarePosts }] = await Promise.all([
     client.from('discoveries').select('*').order('created_at', { ascending: false }).limit(100),
     client.from('square_posts').select('*').order('created_at', { ascending: false }).limit(100),
@@ -73,7 +77,7 @@ export async function applyAppealAction(
   id: string,
   action: 'restore' | 'dismiss'
 ): Promise<void> {
-  const client = getSupabaseClient();
+  const client = getSupabasePrivilegedClient();
   if (source === 'discovery') {
     const { error } = await client
       .from('discoveries')

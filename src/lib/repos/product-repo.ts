@@ -1,7 +1,7 @@
 // 商品治理仓储层：商业化内容合并列表 + 编辑/删除写操作。
 // TODO: 模块化迁移至 src/modules/product-gov（查询走 `listProducts` / `getProductStats`，
 // 写操作经 commands 复用本文件的 applyProductEdit/deleteProduct）。以下导出保留供旧引用兼容。
-import { getSupabaseClient } from '@/storage/database/supabase-client';
+import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
 import type { DiscoveriesRow, SquarePostsRow } from '@/lib/db-types';
 
 export type ProductSource = 'discovery' | 'square';
@@ -36,7 +36,7 @@ export interface ProductData {
 
 /** 商业化内容（discoveries 标记 / 带链接 square_posts）合并列表 + 统计 */
 export async function listProducts(): Promise<ProductData> {
-  const client = getSupabaseClient();
+  const client = getSupabasePrivilegedClient();
   const [{ data: discoveries }, { data: squarePosts }] = await Promise.all([
     client.from('discoveries').select('*').order('created_at', { ascending: false }).limit(100),
     client.from('square_posts').select('*').order('created_at', { ascending: false }).limit(100),
@@ -116,7 +116,7 @@ export interface ProductEditInput {
 
 /** 编辑商品：按 source 精确更新对应表字段（不越界写列） */
 export async function applyProductEdit(input: ProductEditInput): Promise<void> {
-  const client = getSupabaseClient();
+  const client = getSupabasePrivilegedClient();
   const { source, id, title, kind, commission, promoType, url, commercial, status } = input;
 
   if (source === 'discovery') {
@@ -145,6 +145,6 @@ export async function applyProductEdit(input: ProductEditInput): Promise<void> {
 /** 删除商品：真删主库对应行 */
 export async function deleteProduct(source: ProductSource, id: string): Promise<void> {
   const table = source === 'square' ? 'square_posts' : 'discoveries';
-  const { error } = await getSupabaseClient().from(table).delete().eq('id', id);
+  const { error } = await getSupabasePrivilegedClient().from(table).delete().eq('id', id);
   if (error) throw new Error(`deleteProduct failed: ${error.message}`);
 }

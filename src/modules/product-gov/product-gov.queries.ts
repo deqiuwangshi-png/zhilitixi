@@ -3,7 +3,7 @@
 // 008 迁移新增只读视图 v_product_catalog，在数据库层完成 UNION 合并；本层对视图执行
 // 全局 count:'exact' + order + range 分页，source/type/status/q 全部下沉到 WHERE，
 // 根治旧“每表窗口 + 合并切片”导致的丢行 / 截断 / 失序。
-import { getSupabaseClient } from '@/storage/database/supabase-client';
+import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
 import { discoveryToDto, squareToDto } from './product-gov.mapper';
 import { DEFAULT_PAGE_SIZE, SIZES } from './product-gov.schema';
 import type { ProductCatalogViewRow } from '@/lib/db-types';
@@ -18,7 +18,7 @@ function sanitizePageSize(size: number): number {
 async function fetchAuthorNames(ids: string[]): Promise<Record<string, string>> {
   const unique = Array.from(new Set(ids.filter((x): x is string => !!x)));
   if (!unique.length) return {};
-  const client = getSupabaseClient();
+  const client = getSupabasePrivilegedClient();
   const { data } = await client.from('users').select('id,name').in('id', unique);
   const names: Record<string, string> = {};
   for (const u of data ?? []) names[u.id] = u.name ?? '';
@@ -36,7 +36,7 @@ export async function listProducts(query: ProductListQuery): Promise<ProductPage
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  const client = getSupabaseClient();
+  const client = getSupabasePrivilegedClient();
   let builder = client
     .from('v_product_catalog')
     .select('*', { count: 'exact' })
@@ -105,7 +105,7 @@ export async function listProducts(query: ProductListQuery): Promise<ProductPage
 
 /** 顶部统计卡：商品总数 / 商业化内容 / 带链接帖子 / 高风险，全部数据库 count:'exact' */
 export async function getProductStats(): Promise<ProductStats> {
-  const client = getSupabaseClient();
+  const client = getSupabasePrivilegedClient();
   const commercialQ = client
     .from('discoveries')
     .select('id', { count: 'exact' })

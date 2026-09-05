@@ -36,7 +36,7 @@ export function RiskAddDrawer({ onClose }: { onClose: () => void }) {
     <div className="fixed inset-0 z-50 flex justify-end bg-black/30" onClick={onClose}>
       <div
         className="flex h-full w-[480px] flex-col bg-white"
-        style={{ animation: 'drawerIn .25s ease-out' }}
+        style={{ animation: 'drawer-in .25s ease-out' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-[#F0F1F3] px-5 py-4">

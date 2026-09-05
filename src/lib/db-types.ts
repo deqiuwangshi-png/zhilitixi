@@ -211,6 +211,29 @@ type TableDef<T extends Record<string, unknown>> = {
   Relationships: [];
 };
 
+// ---------- 006 迁移：RBAC 治理表 ----------
+export type RolesRow = {
+  id: string; // 'admin' | 'moderator' | ...
+  name: string | null;
+  description: string | null;
+};
+export type PermissionsRow = {
+  id: string; // 即 'report.read' 等 resource.action
+  name: string | null;
+  description: string | null;
+};
+export type RolePermissionsRow = {
+  role_id: string;
+  permission_id: string;
+};
+export type UserRolesRow = {
+  user_id: string; // uuid
+  role_id: string;
+  scope_id: string | null; // uuid
+  granted_by: string | null; // uuid
+  created_at: string | null;
+};
+
 // ---------- 008 迁移：跨表合并统一列表的只读视图 ----------
 // v_product_catalog：discoveries（商业化内容）∪ square_posts（带链接帖子）
 export type ProductCatalogViewRow = {
@@ -262,11 +285,30 @@ export type ContentReviewCatalogViewRow = {
   search_text: string | null; // 归一化可检索拼接
 };
 
+// v_appeal_catalog：discoveries（reason 非空）∪ square_posts（url_status='blocked'）
+export type AppealCatalogViewRow = {
+  id: string;
+  src: string; // 'discovery' | 'square'
+  author_id: string | null;
+  created_at: string | null;
+  title: string | null; // discoveries.title
+  note: string | null; // discoveries.note
+  description: string | null; // discoveries.description
+  content: string | null; // square_posts.content
+  url: string | null;
+  url_status: string | null; // square_posts.url_status
+  norm_reason: string | null; // 归一化标记原因（discovery.reason / square 固定'违规链接'）
+};
+
 export interface Database {
   public: {
     Tables: {
       users: TableDef<UsersRow>;
       governance_penalties: TableDef<GovernancePenaltiesRow>;
+      roles: TableDef<RolesRow>;
+      permissions: TableDef<PermissionsRow>;
+      role_permissions: TableDef<RolePermissionsRow>;
+      user_roles: TableDef<UserRolesRow>;
       reports: TableDef<ReportsRow>;
       discoveries: TableDef<DiscoveriesRow>;
       square_posts: TableDef<SquarePostsRow>;
@@ -290,6 +332,10 @@ export interface Database {
       };
       v_content_review_catalog: {
         Row: ContentReviewCatalogViewRow;
+        Relationships: [];
+      };
+      v_appeal_catalog: {
+        Row: AppealCatalogViewRow;
         Relationships: [];
       };
     };
@@ -326,6 +372,18 @@ export interface Database {
           p_operator_id?: string | null;
           p_request_id?: string | null;
           p_occurred_at?: string;
+        };
+        Returns: unknown;
+      };
+      edit_user_profile_and_role: {
+        Args: {
+          p_user_id: string;
+          p_role?: string | null;
+          p_name?: string | null;
+          p_points?: number | null;
+          p_badge?: string | null;
+          p_operator_id?: string | null;
+          p_request_id?: string | null;
         };
         Returns: unknown;
       };

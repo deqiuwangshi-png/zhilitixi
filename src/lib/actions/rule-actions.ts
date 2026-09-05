@@ -2,9 +2,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { requireAdmin } from '@/lib/auth';
-import { applyRuleAction } from '@/lib/repos/rule-repo';
-import { ruleActionSchema, type RuleActionInput } from '@/lib/validations/rule.schema';
+import { applyRule, type RuleActionInput } from '@/modules/rules';
 
 export interface ActionResult {
   ok: boolean;
@@ -18,10 +16,7 @@ function toError(e: unknown): string {
 /** 域名规则操作（加名单 / 切换 / 删除） */
 export async function handleRuleAction(input: RuleActionInput): Promise<ActionResult> {
   try {
-    await requireAdmin();
-    const parsed = ruleActionSchema.safeParse(input);
-    if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '输入不合法' };
-    await applyRuleAction(parsed.data);
+    await applyRule(input);
     revalidatePath('/rules');
     return { ok: true };
   } catch (e) {

@@ -1,5 +1,5 @@
 // 举报处理仓储层：举报列表组装（编号/联表/重复统计）+ 处理写操作。
-import { getSupabaseClient } from '@/storage/database/supabase-client';
+import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
 import type { ReportsRow } from '@/lib/db-types';
 
 export type ReportStatus = 'pending' | 'approved' | 'rejected';
@@ -63,7 +63,7 @@ function humanTarget(r: ReportsRow): string {
 // TODO(阶段六): listReports 已迁移至 src/modules/report/report.queries.ts（数据库分页，不再固定 500 条）。
 // 本文件保留以兼容 report 前端组件仍从 @/lib/repos/report-repo 引用的 ReportItem 类型，勿删仍被引用的导出。
 export async function listReports(): Promise<ReportItem[]> {
-  const client = getSupabaseClient();
+  const client = getSupabasePrivilegedClient();
   const { data: reports } = await client
     .from('reports')
     .select('*')
@@ -115,6 +115,6 @@ export async function listReports(): Promise<ReportItem[]> {
 /** 处理举报：写回 reports.status（approve→approved / reject→rejected） */
 export async function applyReportAction(id: string, action: 'approve' | 'reject'): Promise<void> {
   const status = action === 'approve' ? 'approved' : 'rejected';
-  const { error } = await getSupabaseClient().from('reports').update({ status }).eq('id', id);
+  const { error } = await getSupabasePrivilegedClient().from('reports').update({ status }).eq('id', id);
   if (error) throw new Error(`applyReportAction failed: ${error.message}`);
 }

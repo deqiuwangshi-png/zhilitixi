@@ -1,12 +1,12 @@
 // 活动上架仓储层：announcements 列表 + 新增/编辑/上架/删除写操作。
-import { getSupabaseClient } from '@/storage/database/supabase-client';
+import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
 import type { AnnouncementsRow } from '@/lib/db-types';
 
 export type ActivityItem = AnnouncementsRow;
 
 /** 活动/公告/Banner 列表（按 sort + created_at 排序） */
 export async function listActivities(): Promise<ActivityItem[]> {
-  const { data, error } = await getSupabaseClient()
+  const { data, error } = await getSupabasePrivilegedClient()
     .from('announcements')
     .select('*')
     .order('sort', { ascending: true })
@@ -36,17 +36,17 @@ export async function saveActivity(input: ActivitySaveInput): Promise<void> {
     active: !!input.active,
   };
   if (input.id) {
-    const { error } = await getSupabaseClient().from('announcements').update(payload).eq('id', input.id);
+    const { error } = await getSupabasePrivilegedClient().from('announcements').update(payload).eq('id', input.id);
     if (error) throw new Error(`saveActivity failed: ${error.message}`);
   } else {
-    const { error } = await getSupabaseClient().from('announcements').insert(payload);
+    const { error } = await getSupabasePrivilegedClient().from('announcements').insert(payload);
     if (error) throw new Error(`saveActivity failed: ${error.message}`);
   }
 }
 
 /** 上架 / 下架（active 取反） */
 export async function toggleActivity(id: string, active: boolean): Promise<void> {
-  const { error } = await getSupabaseClient()
+  const { error } = await getSupabasePrivilegedClient()
     .from('announcements')
     .update({ active: !active })
     .eq('id', id);
@@ -55,6 +55,6 @@ export async function toggleActivity(id: string, active: boolean): Promise<void>
 
 /** 删除活动 */
 export async function deleteActivity(id: string): Promise<void> {
-  const { error } = await getSupabaseClient().from('announcements').delete().eq('id', id);
+  const { error } = await getSupabasePrivilegedClient().from('announcements').delete().eq('id', id);
   if (error) throw new Error(`deleteActivity failed: ${error.message}`);
 }

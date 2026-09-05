@@ -56,37 +56,37 @@
 
 :root {
   --radius: 0.5rem; /* 8px */
-  --background: hsl(216, 18%, 97%); /* #F7F8FA */
-  --foreground: hsl(220, 13%, 13%); /* #1F2329 */
-  --card: hsl(0, 0%, 100%); /* #FFFFFF */
-  --card-foreground: hsl(220, 13%, 13%);
-  --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(220, 13%, 13%);
-  --primary: hsl(168, 100%, 20%); /* #006855 品牌绿 */
-  --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(168, 45%, 94%);
-  --secondary-foreground: hsl(168, 100%, 20%);
-  --muted: hsl(216, 18%, 97%);
-  --muted-foreground: hsl(220, 7%, 46%); /* #646A73 */
-  --accent: hsl(168, 45%, 94%); /* #E8F5F1 选中/hover背景 */
-  --accent-foreground: hsl(168, 100%, 20%); /* #006855 */
-  --destructive: hsl(4, 90%, 58%); /* #F54A45 高风险 */
-  --border: hsl(228, 14%, 91%); /* #E5E6EB */
-  --input: hsl(228, 14%, 91%);
-  --ring: hsl(168, 100%, 20%);
-  --chart-1: hsl(168, 100%, 20%);
-  --chart-2: hsl(216, 100%, 60%);
-  --chart-3: hsl(32, 100%, 50%);
-  --chart-4: hsl(155, 100%, 33%);
-  --chart-5: hsl(4, 90%, 58%);
-  --sidebar: hsl(0, 0%, 100%); /* #FFFFFF 浅色侧边栏 */
-  --sidebar-foreground: hsl(220, 13%, 13%); /* #1F2329 主文字 */
-  --sidebar-primary: hsl(168, 100%, 20%);
-  --sidebar-primary-foreground: hsl(0, 0%, 100%);
-  --sidebar-accent: hsl(168, 45%, 94%); /* #E8F5F1 选中/hover 背景 */
-  --sidebar-accent-foreground: hsl(168, 100%, 20%);
-  --sidebar-border: hsl(228, 14%, 91%); /* #E5E6EB 边框 */
-  --sidebar-ring: hsl(168, 100%, 20%);
+  --background: hsl(216 18% 97%); /* #F7F8FA */
+  --foreground: hsl(220 13% 13%); /* #1F2329 */
+  --card: hsl(0 0% 100%); /* #FFFFFF */
+  --card-foreground: hsl(220 13% 13%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(220 13% 13%);
+  --primary: hsl(168 100% 20%); /* #006855 品牌绿 */
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(168 45% 94%);
+  --secondary-foreground: hsl(168 100% 20%);
+  --muted: hsl(216 18% 97%);
+  --muted-foreground: hsl(220 7% 46%); /* #646A73 */
+  --accent: hsl(168 45% 94%); /* #E8F5F1 选中/hover背景 */
+  --accent-foreground: hsl(168 100% 20%); /* #006855 */
+  --destructive: hsl(4 90% 58%); /* #F54A45 高风险 */
+  --border: hsl(228 14% 91%); /* #E5E6EB */
+  --input: hsl(228 14% 91%);
+  --ring: hsl(168 100% 20%);
+  --chart-1: hsl(168 100% 20%);
+  --chart-2: hsl(216 100% 60%);
+  --chart-3: hsl(32 100% 50%);
+  --chart-4: hsl(155 100% 33%);
+  --chart-5: hsl(4 90% 58%);
+  --sidebar: hsl(0 0% 100%); /* #FFFFFF 浅色侧边栏 */
+  --sidebar-foreground: hsl(220 13% 13%); /* #1F2329 主文字 */
+  --sidebar-primary: hsl(168 100% 20%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(168 45% 94%); /* #E8F5F1 选中/hover 背景 */
+  --sidebar-accent-foreground: hsl(168 100% 20%);
+  --sidebar-border: hsl(228 14% 91%); /* #E5E6EB 边框 */
+  --sidebar-ring: hsl(168 100% 20%);
 }
 
 .dark {
@@ -136,12 +136,12 @@ body {
   @apply font-sans;
 }
 
-@keyframes drawerIn {
+@keyframes drawer-in {
   from { transform: translateX(100%); }
   to { transform: translateX(0); }
 }
 
-@keyframes fadeIn {
+@keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
 }

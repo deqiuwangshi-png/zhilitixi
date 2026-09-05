@@ -69,17 +69,6 @@ function getSupabasePrivilegedClient(): SupabaseClient<Database> {
   return globalForSupabase.__govSupabaseServerClient;
 }
 
-// 兼容现有业务 repo；新认证代码必须明确选择 RLS 或 privileged 客户端。
-function getSupabaseClient(): SupabaseClient<Database> {
-  const { url, anonKey } = getSupabaseCredentials();
-  const globalForSupabase = globalThis as unknown as { __govSupabaseLegacyClient?: SupabaseClient<Database> };
-  if (!globalForSupabase.__govSupabaseLegacyClient) {
-    const serviceRoleKey = getSupabaseServiceRoleKey();
-    globalForSupabase.__govSupabaseLegacyClient = buildClient(url, serviceRoleKey ?? anonKey, undefined);
-  }
-  return globalForSupabase.__govSupabaseLegacyClient;
-}
-
 function buildClient(url: string, key: string, authHeaders: Record<string, string> | undefined): SupabaseClient<Database> {
   const globalOptions: { headers?: Record<string, string>; fetch?: typeof fetch } = {};
   if (authHeaders) {
@@ -113,5 +102,4 @@ export {
   getSupabasePublicClient,
   getSupabaseRlsClient,
   getSupabasePrivilegedClient,
-  getSupabaseClient,
 };

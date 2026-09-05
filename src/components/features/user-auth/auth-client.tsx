@@ -87,7 +87,7 @@ export function AuthClient({ verifications }: { verifications: VerificationItem[
       {selected && (
         <div className="fixed inset-0 z-50 flex justify-end">
           <div className="absolute inset-0 bg-black/30" onClick={() => setSelected(null)} />
-          <div className="relative flex h-full w-[480px] max-w-full flex-col bg-white shadow-2xl" style={{ animation: 'drawerIn .25s ease-out' }}>
+          <div className="relative flex h-full w-[480px] max-w-full flex-col bg-white shadow-2xl" style={{ animation: 'drawer-in .25s ease-out' }}>
             <div className="flex items-center justify-between border-b border-[#E5E6EB] px-6 py-4">
               <div>
                 <h2 className="text-base font-semibold text-[#1F2329]">认证详情</h2>

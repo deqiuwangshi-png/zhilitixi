@@ -6,7 +6,7 @@
 // total 语义：基于数据库 count 的 status/type/reason/q 过滤口径；而 repeat（重复举报
 // 标记）依赖跨页统计无法下沉，仅作为当前页的补充标记（r.repeatCount >= 2），
 // 不影响 total 口径，不做夸大。
-import { getSupabaseClient } from '@/storage/database/supabase-client';
+import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client';
 import { contentTypeMap, reasonMap, rowToDto } from './report.mapper';
 import { SIZES } from './report.schema';
 import type {
@@ -39,7 +39,7 @@ function sanitizePageSize(size: number): number {
 }
 
 /** 页内用户名联表（举报人 + 被举报用户） */
-async function fetchUserNames(client: ReturnType<typeof getSupabaseClient>, rows: ReportListRow[]): Promise<Record<string, string>> {
+async function fetchUserNames(client: ReturnType<typeof getSupabasePrivilegedClient>, rows: ReportListRow[]): Promise<Record<string, string>> {
   const userIds = new Set<string>();
   for (const r of rows) {
     if (r.reporter_id) userIds.add(r.reporter_id);
@@ -86,7 +86,7 @@ export async function listReports(
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  const client = getSupabaseClient();
+  const client = getSupabasePrivilegedClient();
   let builder = client
     .from('reports')
     .select('id,reporter_id,target_type,target_id,reason,status,created_at', {
