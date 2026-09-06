@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="w3gXUPeg9SUTRzwVVlAXdZ">
+<head data-page-node-id="1PCRctlo46SEOj7FQyQzbi">
+<meta charset="UTF-8" data-page-node-id="BDHxbFIiBcEmMmuvlMa1Tl">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="gZ61BAWeaRLER6l7osMxAh">
+<title>引力治理体系中心 — 功能布局线框手册</title>
+<style>
+  :root{
+    --bg:#F7F8FA; --card:#FFFFFF; --line:#E5E6EB; --line2:#D0D3D9;
+    --tx:#1F2329; --tx2:#646A73; --tx3:#8F959E;
+    --brand:#006855; --brand-soft:#E8F5F1;
+    --ok:#00A870; --info:#3370FF; --warn:#FF8800; --danger:#F54A45;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--bg); color:var(--tx); font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; font-size:13px; line-height:1.6; padding:32px 20px 60px;}
+  .wrap{max-width:1080px; margin:0 auto;}
+  h1{font-size:22px; font-weight:600; margin-bottom:4px;}
+  .sub{color:var(--tx2); margin-bottom:24px;}
+  h2{font-size:17px; font-weight:600; margin:40px 0 6px; padding-left:10px; border-left:4px solid var(--brand);}
+  .hint{color:var(--tx3); font-size:12px; margin-bottom:14px;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px 18px; margin-bottom:16px;}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .grid2 .card{margin-bottom:0;}
+  table{border-collapse:collapse; width:100%; font-size:12.5px;}
+  th{background:#FAFBFC; text-align:left; padding:7px 10px; border-bottom:1px solid var(--line); font-weight:600; white-space:nowrap;}
+  td{padding:7px 10px; border-bottom:1px solid var(--line); vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  .route{font-family:Consolas,monospace; font-size:12px; color:var(--info);}
+  .badge{display:inline-block; padding:1px 8px; border-radius:4px; font-size:11.5px; background:#F0F1F3; color:var(--tx2);}
+  .b-brand{background:var(--brand-soft); color:var(--brand);}
+  .b-ok{background:#E8F7F1; color:var(--ok);}
+  .b-info{background:#EBF2FF; color:var(--info);}
+  .b-warn{background:#FFF4E5; color:#CC6E00;}
+  .b-danger{background:#FEEEEE; color:var(--danger);}
+  .wf{border:1px solid var(--line); border-radius:10px; overflow:hidden;}
+  .wf-head{display:flex; justify-content:space-between; align-items:center; padding:10px 16px; background:#FAFBFC; border-bottom:1px solid var(--line);}
+  .wf-head b{font-size:14px;}
+  .wf-head span{color:var(--tx3); font-size:12px;}
+  .wf-body{background:#fff; padding:18px;}
+  .frame{display:grid; grid-template-columns:150px 1fr; border:1px solid var(--line); border-radius:8px; overflow:hidden;}
+  .sidebar{background:#fff; border-right:1px solid var(--line); padding:12px 10px;}
+  .nav-g{font-size:11px; color:var(--tx3); margin:10px 0 4px;}
+  .nav-i{font-size:12.5px; padding:4px 8px; border-radius:6px; color:var(--tx2);}
+  .nav-i.on{background:var(--brand-soft); color:var(--brand);}
+  .topbar{display:flex; justify-content:space-between; padding:8px 16px; border-bottom:1px solid var(--line); color:var(--tx3); font-size:12px;}
+  .av{width:22px; height:22px; border-radius:50%; background:#E5EDFF; color:var(--info); display:inline-flex; align-items:center; justify-content:center; font-size:11px;}
+  .content{background:#FBFCFD; padding:14px;}
+  .stats{display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin-bottom:12px;}
+  .stats .s{background:#FAFBFC; border-radius:8px; padding:8px 10px;}
+  .stats .s .l{font-size:11px; color:var(--tx3);}
+  .stats .s .n{font-size:16px; font-weight:600;}
+  .stats .s .d{font-size:11px; color:var(--ok);}
+  .filters{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;}
+  .fld{height:26px; border-radius:6px; background:#fff; border:1px solid var(--line); display:flex; align-items:center; padding:0 10px; font-size:12px; color:var(--tx3); min-width:80px;}
+  .fld.w{min-width:140px;}
+  .btn{display:inline-block; padding:4px 12px; border-radius:6px; font-size:12px; background:var(--brand); color:#fff; border:none;}
+  .btn.ghost{background:#fff; color:var(--tx); border:1px solid var(--line2);}
+  .btn.gray{background:#6B7280; color:#fff;}
+  .btn.danger{background:#fff; color:var(--danger); border:1px solid #F5C6C3;}
+  table.m{border:1px solid var(--line);}
+  table.m th, table.m td{border-bottom:1px solid var(--line); padding:6px 8px; font-size:12px;}
+  table.m th{background:#FAFBFC;}
+  .ops{display:flex; gap:6px; color:var(--brand); font-size:12px;}
+  .ops .del{color:var(--danger);}
+  .tag{display:inline-block; padding:0 6px; border-radius:4px; font-size:11px;}
+  .tag.p{background:#FFF4E5; color:#CC6E00;}
+  .tag.g{background:#E8F7F1; color:var(--ok);}
+  .tag.r{background:#FEEEEE; color:var(--danger);}
+  .tag.b{background:#EBF2FF; color:var(--info);}
+  .tabs{display:flex; border-bottom:1px solid var(--line); margin-bottom:12px;}
+  .tab{padding:5px 12px; font-size:12.5px; color:var(--tx3); border-bottom:2px solid transparent;}
+  .tab.on{color:var(--brand); border-bottom-color:var(--brand);}
+  .pager{display:flex; justify-content:space-between; align-items:center; color:var(--tx3); font-size:12px; margin-top:10px;}
+  .pg{display:flex; gap:4px;}
+  .pg i{font-style:normal; width:22px; height:22px; border:1px solid var(--line); border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:12px;}
+  .pg i.on{background:var(--brand); color:#fff; border-color:var(--brand);}
+  .note{border:1px dashed #A8C4FF; background:#F2F7FF; color:#2B5FC7; border-radius:8px; padding:8px 12px; font-size:12px; margin-top:10px;}
+  .arch{display:flex; flex-direction:column; gap:0;}
+  .arch .layer{display:grid; grid-template-columns:130px 1fr; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:#fff;}
+  .arch .layer .ln{background:#FAFBFC; font-weight:600; font-size:13px; padding:12px; display:flex; align-items:center; color:var(--brand);}
+  .arch .layer .lb{padding:10px 14px; font-size:12.5px; color:var(--tx2);}
+  .arch .arr{text-align:center; color:var(--tx3); font-size:11px; padding:2px 0;}
+  .chip{display:inline-block; background:#F0F1F3; border-radius:4px; padding:0 6px; margin:0 3px 3px 0; font-size:11.5px; color:var(--tx);}
+  ul.plain{list-style:none;}
+  ul.plain li{padding:3px 0 3px 18px; position:relative; font-size:12.5px; color:var(--tx2);}
+  ul.plain li:before{content:""; position:absolute; left:2px; top:10px; width:6px; height:6px; border-radius:2px; background:var(--brand);}
+  .cols{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:8px;}
+  .cols .c{background:#FAFBFC; border:1px solid var(--line); border-radius:8px; padding:10px 12px;}
+  .cols .c b{font-size:12.5px; color:var(--brand);}
+  .cols .c ul{list-style:none; margin-top:4px;}
+  .cols .c li{font-size:12px; color:var(--tx2); padding:2px 0; border-bottom:1px dashed var(--line);}
+  .cols .c li:last-child{border-bottom:none;}
+  @media(max-width:860px){.grid2{grid-template-columns:1fr;} .stats{grid-template-columns:repeat(3,1fr);} .cols{grid-template-columns:1fr;}}
+</style>
+</head>
+<body data-page-node-id="1FqzTCfSLXBEgVQSS21HVh">
+<div class="wrap" data-page-node-id="45Z8psgOJ1Q17tQ95dle0n">
+
+<h1 data-page-node-id="XI5aCRwABATbJMDaErDSu4">引力治理体系中心 — 功能布局线框手册</h1>
+<div class="sub" data-page-node-id="nwEmbq36FSsaBvQizoWytk">全后台功能盘点 · 11 个页面线框 · 6 大功能模块分类 · 五层架构布局 &nbsp;|&nbsp; 2026-09-06</div>
+
+<!-- ============ 一、功能地图 ============ -->
+<h2 data-page-node-id="rDdkoExdzSXtq9TjxOFEnc">一、功能地图总览</h2>
+<div class="hint" data-page-node-id="OJpSRpZ9EpIuHHu5hqzqzX">后台由 1 个登录前置页 + 10 个治理/运营页组成，按职责归入 6 大功能模块。除登录页外全部页面共享「侧边栏 + 顶部栏 + 内容区」的统一后台框架。</div>
+<div class="cols" data-page-node-id="xYCbnApocqtIBi6UAUTEFd">
+  <div class="c" data-page-node-id="cQiAxH8dW5dGPYPrxsw7U9"><b data-page-node-id="rCfWj8WrbQf6YzqsmZjpsM">① 工作台</b><ul data-page-node-id="s0izqBfbPftSY8lVdHzKA2"><li data-page-node-id="GXgxbvO32fX8i9iubJd3GP">治理总览 <span class="route" data-page-node-id="KF5iUZg9dL1iYuOJ9xSS2y">/</span></li><li class="route" data-page-node-id="iP6WqRQXdzCff7IFKFLL0V">—</li><li data-page-node-id="wssU5qktGYuuZ7gUKPNkrD">只读看板，唯一无写操作页</li></ul></div>
+  <div class="c" data-page-node-id="J8LDRqCUzXYzbeiWxrlPBj"><b data-page-node-id="UU8esBmEFG6Kere8n4D2Ij">② 内容与商品治理</b><ul data-page-node-id="4XequiQDlCWSJXLa0555Dq"><li data-page-node-id="rHLMXUY01QzVDemmDntVff">内容审核 <span class="route" data-page-node-id="MzWY7Q4GnqBNvLjFp08bT6">/content-review</span></li><li data-page-node-id="OO6ph9OHiTxOromMDzrazt">商品治理 <span class="route" data-page-node-id="iL3YoYwUZDnoGgLdJtqHbO">/product-gov</span></li><li data-page-node-id="AimN9MLgw2nLH8kbpO7DQs">列表 + 批量审核 / 双抽屉编辑</li></ul></div>
+  <div class="c" data-page-node-id="FLskiqmV1AZkFuFitTuW3q"><b data-page-node-id="FsLHefhbFvEBcR2KvbLGZe">③ 用户与认证</b><ul data-page-node-id="bCgcGOQSjtNCxKH8vcSAIC"><li data-page-node-id="eKeuqbPS2PUtns3Ksi6iXu">用户认证 <span class="route" data-page-node-id="5ANVwDDjdTzPUKS0fQhIGp">/user-auth</span></li><li data-page-node-id="RAq23d681KwUJ7o4CInYpG">用户管理 <span class="route" data-page-node-id="Yo0THe4sJiCdgRWPzma9LP">/user-management</span></li><li data-page-node-id="hT9AzjGAZF9YtyO5fZlVPh">认证复核 / 封禁限流处置</li></ul></div>
+  <div class="c" data-page-node-id="55NuhdXGl8UR0GIq16FoDR"><b data-page-node-id="Nbt81XU6KxVvdjTAWdREI0">④ 举报与申诉</b><ul data-page-node-id="46wCgXY8lfJHYOUIdpkCuG"><li data-page-node-id="IkQsBK8TBt1j3fe5zuwp9G">举报处理 <span class="route" data-page-node-id="zvLRjzEUEcCvvHuGZhhdZ8">/report</span></li><li data-page-node-id="J2jG3CRS7L8eClHyT0sGqX">侵权申诉 <span class="route" data-page-node-id="2aj8TFTOH2AsMI3jSR4kCb">/infringement</span></li><li data-page-node-id="KmwkayGofyaFQAWUaIIjae">工单处理 / 申诉复核</li></ul></div>
+  <div class="c" data-page-node-id="hDi7Y66TJ2D4Ic5qslDESR"><b data-page-node-id="IpyP7SyiAvnXyga07Cjj4G">⑤ 风控与规则</b><ul data-page-node-id="bI78f9b0TEZOAWpsTcgObG"><li data-page-node-id="FTVehcvkGr46yIHNoN0LQO">风控中心 <span class="route" data-page-node-id="Gmo3bFx1Ub0QUkt7Y2P0Af">/risk-control</span></li><li data-page-node-id="9wbE2RGIQMupP5lntO4Db4">规则与处罚 <span class="route" data-page-node-id="EZCStxinHqy5K2EoKR1Sea">/rules</span></li><li data-page-node-id="GpjfHZJB5WmmGytMuEiMp1">URL/域名/上传风控 · 名单管理</li></ul></div>
+  <div class="c" data-page-node-id="Lsfx8XO4An8nMj0qL2Mjt2"><b data-page-node-id="RMRrys4EuxOl0lS5ikop2G">⑥ 运营活动</b><ul data-page-node-id="GdN4qAGdmDkY9fmSu55vqO"><li data-page-node-id="tMAYEpseqJOT9LHGwFMWia">活动上架编辑 <span class="route" data-page-node-id="42Wnmp8XqF1ijWR5E0RXie">/activity</span></li><li class="route" data-page-node-id="VLkGAKlTH3uJdtTfKFBWZS">—</li><li data-page-node-id="XQvcfRBASAdQqPaDJJk2bF">活动/公告/Banner 内容运营</li></ul></div>
+</div>
+
+<!-- ============ 二、框架 ============ -->
+<h2 data-page-node-id="4WI3BEP74ssQKGF0Ue6Rgl">二、页面骨架（框架层）</h2>
+<div class="grid2" data-page-node-id="uygRTXDzQwpBCtIAFiKjR0">
+  <div class="card" data-page-node-id="rTGKztcGIY1t8bKb3Jfj0w">
+    <b data-page-node-id="zg9q1qhdQOw6xHYWNa40WC">登录页</b> <span class="route" data-page-node-id="BVof1uHOhWMxtdBMWbXINV">/login</span>
+    <div class="hint" data-page-node-id="rMLymnGHduuYQC1G1pgWAq">唯一前置页面 · 运营人员邮箱密码登录 · 无侧边栏</div>
+    <div style="max-width:280px; margin:0 auto; border:1px solid var(--line); border-radius:10px; padding:22px 20px; display:flex; flex-direction:column; gap:12px;" data-page-node-id="xDYeAdJhPpX48k5jN7XV9B">
+      <div style="text-align:center; font-weight:600; color:var(--brand);" data-page-node-id="Sp4xRFKgGJUvHaPHlD4oOe">引力治理中心</div>
+      <div class="fld w" data-page-node-id="gBPnUcIIQ6nxutOwHNa5kp">邮箱账号</div>
+      <div class="fld w" data-page-node-id="gMHKnz7W6zG30qWWNRBRkC">密码</div>
+      <div style="font-size:12px; color:var(--danger); min-height:16px;" data-page-node-id="uB2O58hMyWvcltLZKFsg8x">错误提示条（失败时出现）</div>
+      <div style="background:var(--brand); color:#fff; border-radius:8px; text-align:center; padding:8px 0;" data-page-node-id="FA3X9IKvBM4uO4hnDEXrdt">登 录</div>
+      <div style="text-align:center; font-size:11px; color:var(--tx3);" data-page-node-id="2KBGL8u3nqtiOSb6gqY7ml">版权说明</div>
+    </div>
+  </div>
+  <div class="card" data-page-node-id="pR4QJNfc01TnG49hj71ttn">
+    <b data-page-node-id="4HYKz8GkwzNAo9kBIRTClA">统一后台框架</b> <span class="badge b-brand" data-page-node-id="ZoVprGznVNJYyvUR5qyzbL">除登录页外全部页面</span>
+    <div class="hint" data-page-node-id="H7pkd0MsDBNfxhGtqJzY3t">三层骨架：侧边栏导航（3 组）· 顶部栏（当前管理员）· 内容区（页面内容）</div>
+    <div class="frame" data-page-node-id="mWSF8kyaquTYas9JeLewRK">
+      <div class="sidebar" data-page-node-id="4i0KaYiRrNiLIiPep4vyoA">
+        <div style="font-weight:600; color:var(--brand); padding:2px 8px;" data-page-node-id="yQKUzGwbE6Y6YcQyomBm45">引力治理</div>
+        <div class="nav-g" data-page-node-id="6bu29vxUnRgVA5BMtzPl2K">工作台</div><div class="nav-i on" data-page-node-id="aMmUC89qlRNeaIwqHIAz7L">治理总览</div>
+        <div class="nav-g" data-page-node-id="m5JWpeEIfvVhxbzNx3dBh3">审核与处置</div>
+        <div class="nav-i" data-page-node-id="vKrtjS56WlLKzWHVFGyHSG">内容审核 · 用户认证 · 用户管理 · 商品治理 · 举报处理 · 侵权与申诉 · 风控中心</div>
+        <div class="nav-g" data-page-node-id="jMSNDZ9YxFMMtyYqVaQVDB">运营与规则</div><div class="nav-i" data-page-node-id="jVr8bKLBgRoFPh4d5fYG0U">活动上架编辑 · 规则与处罚</div>
+      </div>
+      <div data-page-node-id="Ik8c6WHkrWgfxzynHVjuk0">
+        <div class="topbar" data-page-node-id="LNB9ZPM8nKkk6liEVX2fuX"><span data-page-node-id="6w7tvUpA88DgSaWDwDIGMv">页面标题 / 面包屑</span><span data-page-node-id="k9hkvLjUzCT1A20I6qM4JG"><span style="margin-right:6px" data-page-node-id="8lBESbXX8vPMvyZvQhJPGu">当前管理员</span><span class="av" data-page-node-id="X9XxlNzKwZcGisSHFJKhwZ">运</span></span></div>
+        <div class="content" style="min-height:150px; display:flex; align-items:center; justify-content:center; color:var(--tx3);" data-page-node-id="GU0bFeW02qasxHZC9w7z6B">内容区 = 各页面独有的区块（统计卡 / 筛选 / 表格 / 抽屉）</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 三、各页面线框 ============ -->
+<h2 data-page-node-id="H0WOHV3vHrzTdOZgAX9CAO">三、页面线框（按功能模块）</h2>
+
+<!-- ① 工作台 -->
+<div class="card" data-page-node-id="3epGle3sr9SMa0noNFGz2o">
+  <div class="wf-head" data-page-node-id="qUmhCHTb6vkZ051IRWFt2B"><b data-page-node-id="VgvPVDpPeRCmA3Qq2Ol9NB">模块 ① 工作台 · 治理总览</b><span class="route" data-page-node-id="hC08Mzudo9A9IztxisqqD1">/</span></div>
+  <div class="hint" data-page-node-id="6yOdSO2MAWFVasrrbyd89c">RSC 直查 · 只读看板 · 统计卡 + 图表双栏 + 列表双栏 · 区间切换走 URL ?range=7|30</div>
+  <div class="stats" data-page-node-id="EZzKTLnKvIMdAWCNuFFCXO">
+    <div class="s" data-page-node-id="GtjveuLIKBCpvJNkexxyG1"><div class="l" data-page-node-id="eM0VoFfRnuiYR2TwzcyCVi">新增举报</div><div class="n" data-page-node-id="MgDdwpTUV8Y7HiLX7Phihf">128</div><div class="d" data-page-node-id="4TXJF8OCcRIAuymRBHWyYc">环比 +12%</div></div>
+    <div class="s" data-page-node-id="7YguUphuSyF0wLykI7M3DH"><div class="l" data-page-node-id="I7Ut5YSCI7TyoeN0D8S60Y">待审内容</div><div class="n" data-page-node-id="Vp320qMkTGg26MH6c5ipn1">356</div><div class="d" data-page-node-id="dU14YcKKmBWUiGInHsZWSZ">环比 -4%</div></div>
+    <div class="s" data-page-node-id="3Op4yNWLvYbRkaXhFxN20e"><div class="l" data-page-node-id="sXtqGptot54zxIrir23BNw">风险预警</div><div class="n" data-page-node-id="qY362Fs3Gsb31nkePTEyqF">23</div><div class="d" data-page-node-id="kQXEV6EkMTRAppmTfELYWe">环比 +8%</div></div>
+    <div class="s" data-page-node-id="A8E6Mq4LE0kb7OSpCpQ8Dv"><div class="l" data-page-node-id="7c1tAereDsjChv5Or9XEnJ">封禁用户</div><div class="n" data-page-node-id="Jh88By3gbpfjcUcnAG9KdI">47</div><div class="d" data-page-node-id="OXtpDNQ1dXff1Ub8hFDnSp">环比 +3%</div></div>
+    <div class="s" data-page-node-id="49t7YmaXBZ4VyiJz0aWrVx"><div class="l" data-page-node-id="UFQhfsUpIPKs0epOOBq2p9">处理中</div><div class="n" data-page-node-id="4s3ITY0wDr8TDNgPFByDLe">89</div><div class="d" data-page-node-id="4KgEblUsiT7ffRdbIkU51k">环比 -2%</div></div>
+    <div class="s" data-page-node-id="w9cROCmTnO7NkFFfTTQDSM"><div class="l" data-page-node-id="zOeAa1wHsudkoCerWrsx1B">合规率</div><div class="n" data-page-node-id="LZ05srSWCMSUwZUHaYYygx">96%</div><div class="d" data-page-node-id="y5FbdbOCeVH5Ff5vSJprU8">环比 +1%</div></div>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;" data-page-node-id="cMpBA18IAj5FghvT3su11a">
+    <div style="border:1px solid var(--line); border-radius:8px; padding:10px;" data-page-node-id="Ll7Ptdg1ARnMw6VMBiaoow">
+      <div style="display:flex; justify-content:space-between; font-size:12.5px;" data-page-node-id="dfA4T2MvIApaG3DkzivZOm"><b data-page-node-id="RkOCFWil54s1dr9CZZvbbX">举报趋势</b><span class="badge b-brand" data-page-node-id="Kc3GbY9UnEPdiTSRkkKebq">近7天/近30天 切换</span></div>
+      <div style="height:60px; display:flex; align-items:flex-end; gap:4px; margin-top:8px;" data-page-node-id="hskwKlWOVLrxdl27QQxTJH">
+        <i style="flex:1; background:var(--brand); height:60%; border-radius:3px 3px 0 0;" data-page-node-id="Vg1PSL4Jvi5Tb24b9o746n"></i>
+        <i style="flex:1; background:#9ACBC0; height:38%; border-radius:3px 3px 0 0;" data-page-node-id="E2K8FY1bi4GXkHdf4nukSH"></i>
+        <i style="flex:1; background:var(--brand); height:72%; border-radius:3px 3px 0 0;" data-page-node-id="fiMu3D5KpeifYmGUr44FvQ"></i>
+        <i style="flex:1; background:#9ACBC0; height:50%; border-radius:3px 3px 0 0;" data-page-node-id="14YSG1ku306EvPXucrXSOt"></i>
+        <i style="flex:1; background:var(--brand); height:88%; border-radius:3px 3px 0 0;" data-page-node-id="QtDGrUN62nWn4jj9XnWsmX"></i>
+        <i style="flex:1; background:#9ACBC0; height:30%; border-radius:3px 3px 0 0;" data-page-node-id="W9EPSVZXVzYaXAqYQRwftX"></i>
+        <i style="flex:1; background:var(--brand); height:66%; border-radius:3px 3px 0 0;" data-page-node-id="4iw5Jvkl829J9Qh2uNKwNw"></i>
+      </div>
+    </div>
+    <div style="border:1px solid var(--line); border-radius:8px; padding:10px;" data-page-node-id="1CCm0a5UhCk5RHIemh82Gc">
+      <b style="font-size:12.5px;" data-page-node-id="tdW4u51hIw5t9S1FgssFDZ">处罚分布</b>
+      <div style="margin-top:8px; font-size:12px;" data-page-node-id="hayd4wUgzlqiZtVpnPRLz4">
+        <div style="display:grid; grid-template-columns:40px 1fr 30px; gap:6px; align-items:center;" data-page-node-id="bGxxq3VcFAv4w1crg1epdY">警告<i style="background:#B9D7F2; height:10px; border-radius:5px;" data-page-node-id="BxdcnSCzDtvP8ujuCIB9sz"></i>32</div>
+        <div style="display:grid; grid-template-columns:40px 1fr 30px; gap:6px; align-items:center; margin-top:6px;" data-page-node-id="fFeKP8CarofwLxPfv9h00X">限流<i style="background:#3370FF; height:10px; border-radius:5px;" data-page-node-id="mXJfnHQhKW4WrZFn43enJF"></i>41</div>
+        <div style="display:grid; grid-template-columns:40px 1fr 30px; gap:6px; align-items:center; margin-top:6px;" data-page-node-id="Z62JrD33WeWgNRH0qzJs2A">封禁<i style="background:#E24B4A; height:10px; border-radius:5px;" data-page-node-id="RaKoib5Np6cnpoYrWimzxu"></i>23</div>
+      </div>
+    </div>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;" data-page-node-id="XlXpEvCDKJM9Pobiczz52C">
+    <div style="border:1px solid var(--line); border-radius:8px; padding:10px; font-size:12.5px;" data-page-node-id="j7s9zQx1pC5F9H03yKHpY5"><b data-page-node-id="2JG9FbtxzuONH6Lm5TT3Ez">待处理举报 TOP 10</b>
+      <div style="color:var(--tx2); margin-top:6px; font-size:12px;" data-page-node-id="eqZmC8b6fID149946AelhQ">— 举报标题 · 高优先/待处理标记（点击前往举报处理）</div></div>
+    <div style="border:1px solid var(--line); border-radius:8px; padding:10px; font-size:12.5px;" data-page-node-id="07cVq38lNMarfDIisoncMP"><b data-page-node-id="qI2Lrvwit5YGoJwK25zvMP">高风险用户</b>
+      <div style="color:var(--tx2); margin-top:6px; font-size:12px;" data-page-node-id="MHVEAmFocDKbQ5OjiyhmE4">— 用户昵称 · 处罚次数 · 风险级别（点击前往用户管理）</div></div>
+  </div>
+</div>
+
+<!-- ② 内容与商品 -->
+<div class="grid2" data-page-node-id="mQWF3NvBh2MGIS43TaKoiI">
+  <div class="card" data-page-node-id="pkNhP8FEBQipkNXfag7L3b">
+    <div class="wf-head" data-page-node-id="oSH1AWUm04SGAblUyzX9JT"><b data-page-node-id="cDeAtzMxkqGdUS5z3yXMq0">内容审核</b><span class="route" data-page-node-id="9D9NvqnVCbjdPCmYzFg9v9">/content-review</span></div>
+    <div class="hint" data-page-node-id="lZpSLYHu3QSLUmrGlwIegm">多源内容审核队列 · 支持多选批量 · 行内通过/驳回</div>
+    <div class="filters" data-page-node-id="y4dpLVEUGlrzrkhGkA8X6h"><span class="fld" data-page-node-id="Ds6X5HVrvDKoub0wsJ3qBd">状态下拉</span><span class="fld" data-page-node-id="578iTqzI6oTjWnyiUSNuCf">类型下拉</span><span class="fld" data-page-node-id="Lz7AYhz7sxOvtVB6Q4qeQK">分类下拉</span><span class="fld w" data-page-node-id="6PGef9gojHKtBHmbf8sv4X">关键词搜索…</span></div>
+    <div style="background:#EBF2FF; color:var(--info); border-radius:6px; padding:4px 10px; font-size:12px; margin-bottom:8px;" data-page-node-id="L87Sd70Xhk0ynOXaRbxlZq">☑ 已选 3 项 → [批量通过] [批量驳回]</div>
+    <table class="m" data-page-node-id="PB5UMJMrw1Gc78X23EJw4c"><tr data-page-node-id="fj8WPji9JUbufNyu02YPKn"><th style="width:14px" data-page-node-id="fDPpsX0hcbmB2HE7EPYF3x"></th><th data-page-node-id="wbTKLPQbF1GEIuzECz9ekO">标题</th><th data-page-node-id="2MEgBRoL0EITEagaBoAZjl">类型</th><th data-page-node-id="FoN7m1J5XhPL9yclo3Epr5">作者</th><th data-page-node-id="4DpcSFEg1Av3goDWrbwnrl">状态</th><th data-page-node-id="MrMhHy0bqx5kWS2QYCMmFU">发布时间</th><th style="width:80px" data-page-node-id="u5hc2UlxxSWf8axEPkyHZv">操作</th></tr>
+    <tr data-page-node-id="q5RaY0ZKYxqFl8n5puV7Rh"><td data-page-node-id="9eQB0tVyvoJ2WUZmRSCoHE">☐</td><td data-page-node-id="LsQQPrEBodjLDeihMUKndp">待审文章标题…</td><td data-page-node-id="byEPgHqmn8c1IoI0qel0N6">文章</td><td data-page-node-id="pcJZ0GJ8cLfqSBI5m4FZVS">用户A</td><td data-page-node-id="XrJ6c5saxswPqTbVVtP0Xt"><span class="tag p" data-page-node-id="t66YZE3yzVAQx7bnzBg8qV">待审核</span></td><td data-page-node-id="mSDlcPLtmQwKNwCLVNVlmL">09-06</td><td class="ops" data-page-node-id="70HO4ODFagFR15aaUmCzmW"><span data-page-node-id="aD0tvS7ZeoztoDo4fQWZ71">通过</span><span class="del" data-page-node-id="cSO66ggPL2WuzvNZfslznt">驳回</span></td></tr>
+    <tr data-page-node-id="lt5ntpRpZl5wp2Tu5OejbW"><td data-page-node-id="nzzF8E2AB4JXu7uHMELtGA">☐</td><td data-page-node-id="7yJyerAMx7EiCa72lslVtD">待审帖子标题…</td><td data-page-node-id="B6zcr8KGZghKnap9uhF672">帖子</td><td data-page-node-id="xb618u1aChyyFrH4xc1A9m">用户B</td><td data-page-node-id="26lnMUQVTBiTLMTe55AZ9j"><span class="tag p" data-page-node-id="ljxbiLClsmG1kUKGAlxvt6">待审核</span></td><td data-page-node-id="9fxGLdCBHv2McoIO0b7wvy">09-06</td><td class="ops" data-page-node-id="pHf8ucxIRxeTrNF9PM8SZy"><span data-page-node-id="QXFTLmQ4SdmrzVekfjpN0z">通过</span><span class="del" data-page-node-id="lt5Iy9cCZH7OnDYgzzgVQe">驳回</span></td></tr>
+    <tr data-page-node-id="HhADwYmxD8TJLpk6KqUFfQ"><td data-page-node-id="03eHsN86IncP2u4yyUDBnt">☐</td><td data-page-node-id="mzJ6i4kjjxMRqjeAExsuBu">已通过内容标题…</td><td data-page-node-id="tdMp3qxcWyGWnEcSoXZ6ZM">图片</td><td data-page-node-id="lGhH8glP7Dz7p6YFYV9o1M">用户C</td><td data-page-node-id="rbYab4PARcLAPaxKD4lB6c"><span class="tag g" data-page-node-id="orGvgRRIpRX88mIzX64o4U">已通过</span></td><td data-page-node-id="ShdH6AmndhoIAzH4eXM0i6">09-05</td><td class="ops" data-page-node-id="hccXxMro7m5rP4HdpRFODk"><span data-page-node-id="Or0owmJBC7Wt3OY7ToTjDM">通过</span><span class="del" data-page-node-id="dNC9mAVgJGL8yIOibgPxE9">驳回</span></td></tr></table>
+    <div class="pager" data-page-node-id="ByQl0bV1O0FGby1Bh6kKMD"><span data-page-node-id="CFpECCDOIcJ1683yEfv0WG">共 356 条</span><span class="pg" data-page-node-id="2EdToVaFtUc8K9thucQsoN"><i class="on" data-page-node-id="aKkt2CVBAbH9jqcMoH74kF">1</i><i data-page-node-id="JCT2db5ghK5IiLYNKRCDLm">2</i><i data-page-node-id="C5BNsafarTo3Ig8lWbP29H">3</i></span><span data-page-node-id="WnXefxxSoJN6lnuPqWscGu">每页 10/20/50</span></div>
+  </div>
+  <div class="card" data-page-node-id="Hh9TNNczqx00WrcoHXS7Yz">
+    <div class="wf-head" data-page-node-id="PzrAFUh7Fqw1Xp0wZlD9sf"><b data-page-node-id="92wjprPN63NMxElGgsOMoS">商品治理</b><span class="route" data-page-node-id="91WyBMYSXdsPDDRXpYi5rG">/product-gov</span></div>
+    <div class="hint" data-page-node-id="EqtI39YU4fPydWzzYuw36H">商业化商品/链接 · 统计卡 + 列表 + 查看/编辑双抽屉</div>
+    <div class="filters" data-page-node-id="ytGWcYUbhvFPYQLqUm8kn9"><span class="fld" data-page-node-id="KmxjtPy812FtRJZEviovWd">总数 1.2k</span><span class="fld" data-page-node-id="OtNqnaxyIe6HLKU2b8Efff">商业化 356</span><span class="fld" data-page-node-id="qqBx9dzSg8FOpDMis0Zmfn">带链接 128</span><span class="fld" data-page-node-id="snId5Qa7FruBDEB7kZy6eD">高风险 23</span></div>
+    <div class="filters" data-page-node-id="SgsPK2zVCAmYCKEeE4jCcL"><span class="fld" data-page-node-id="1uns01J3qHGAtnwPoCSqCt">类型下拉</span><span class="fld" data-page-node-id="qTiSKzSpXZFn9z62UEFcp8">状态下拉</span><span class="fld w" data-page-node-id="YlOFAQbi7Ya74UgwA22ueZ">搜索…</span><span class="btn" data-page-node-id="tlVc5mh25fiHEMgrZobAId">＋ 新增</span></div>
+    <table class="m" data-page-node-id="5F2F0I5Qdo5RiyDhCXhivD"><tr data-page-node-id="744rCUYHP8IRqA5juFqEkH"><th data-page-node-id="Y1RR7thwAswraUG9Usma4X">标题</th><th data-page-node-id="lk12HTGAWOeCW7XpaDv0D3">类型</th><th data-page-node-id="q7SLAhbPvHlZlmE1tr0BCC">作者</th><th data-page-node-id="9VeEn5Jq8Tiqa7Uv7pvEWw">佣金</th><th data-page-node-id="H8UCuN5nojqySXB1BS0FGo">状态</th><th style="width:110px" data-page-node-id="fLhJKDwSmvoxLsQKqFC4sc">操作</th></tr>
+    <tr data-page-node-id="xxODemgTcK0n2bFHjWyc5P"><td data-page-node-id="f69C3kb4JpQ7Bl35f3NNIz">商品链接标题…</td><td data-page-node-id="S1dlaYejEMjC1Fv6RCu572">商品</td><td data-page-node-id="xLTi5cKMNYkvsjsuDSmrCI">用户A</td><td data-page-node-id="CpB9RHV0tki04Wp95anK3r">¥12</td><td data-page-node-id="ZS3QFyZFrwJAFPQVNoDncO"><span class="tag b" data-page-node-id="FgcquiXIE7eFQqD9GSMdS1">正常</span></td><td class="ops" data-page-node-id="itvGom4HQK9e7nRxqz5agG"><span data-page-node-id="mKf3FlLf8vHfDDSujqfcQW">查看</span><span data-page-node-id="JkOtWEDqB6tY3BvLt3unRF">编辑</span><span class="del" data-page-node-id="WBpU5JCsnPWCFcgEelpTww">删除</span></td></tr>
+    <tr data-page-node-id="7RyHAHfWNHoU0OZCSUAoYi"><td data-page-node-id="MNFmSHba5YTNrqqLtjzxHX">推广帖标题…</td><td data-page-node-id="gRIXlhpud2EsPfIyErShCL">推广帖</td><td data-page-node-id="bmP04In1hU9OZPipBKWF0x">用户B</td><td data-page-node-id="BwvW9LYIoEKY37ICRQdmic">—</td><td data-page-node-id="gLa4CimESEgcCLmgXMEoSF"><span class="tag r" data-page-node-id="KonbaISSuOj5iH9UAhuBQe">高风险</span></td><td class="ops" data-page-node-id="EuwSnEC6vToKzCPopViZ9M"><span data-page-node-id="ZzYBi9BMeSYa9gGZC2iHVG">查看</span><span data-page-node-id="ILSFTd4OtoksNJqJkGodEa">编辑</span><span class="del" data-page-node-id="evahEkH295jTFq7iFS9Prm">删除</span></td></tr></table>
+    <div class="note" data-page-node-id="phtkRSEA1KK65dNMhJ45R2">「编辑」→ 抽屉表单：标题 / 分类 / 佣金 / 推广类型 / 链接 / 商业推广勾选 / 状态</div>
+  </div>
+</div>
+
+<!-- ③ 用户与认证 -->
+<div class="grid2" data-page-node-id="7SEjOYpD5EBEQ7DmE0wYEG">
+  <div class="card" data-page-node-id="yjv9MXEGUhczgt4sZrgFFd">
+    <div class="wf-head" data-page-node-id="AvKAKVDOtuqK9j4Plcpy6S"><b data-page-node-id="SnQgdrUuZ1NnoA9J6g3N1X">用户认证</b><span class="route" data-page-node-id="8SBuk4rs433vecDLNbn6n8">/user-auth</span></div>
+    <div class="hint" data-page-node-id="IqQRLDb26F8xHdI1BbHJUY">认证申请审核 · Tab 状态视图 + 详情抽屉</div>
+    <div class="stats" style="grid-template-columns:repeat(4,1fr);" data-page-node-id="koYqTGPfvND9NoXtfNhT5c">
+      <div class="s" data-page-node-id="Xb8T5oUzBKryYJcktDGcPv"><div class="l" data-page-node-id="PMUF7UGCURLgabEHXcqJCU">认证申请</div><div class="n" data-page-node-id="bcRtbx6dukxiCrVJ9regRP">482</div></div>
+      <div class="s" data-page-node-id="JjOUL16EAvOM6KIuZAnt5S"><div class="l" data-page-node-id="ZZ64n6ZsVPJFnRXuDkFK0R">待审核</div><div class="n" data-page-node-id="yvwna2FmCxlNRxM7f0IDaS">36</div></div>
+      <div class="s" data-page-node-id="JyioFMaurdq8xZA3NDSWVk"><div class="l" data-page-node-id="olsB7N8nBC9QjWJNAKT5cW">已通过</div><div class="n" data-page-node-id="XnYi2iT1PAdRXRhja8adw0">412</div></div>
+      <div class="s" data-page-node-id="77kb5RgG8i74cM5xF2Zv2G"><div class="l" data-page-node-id="Xo76qiwpxups8DuHRINnQL">注册用户</div><div class="n" data-page-node-id="pniXe0zfKHVlWVyuS1GuWI">8.9k</div></div>
+    </div>
+    <div class="tabs" data-page-node-id="4IgQEx1OW7fzhz4ZscagD3"><span class="tab on" data-page-node-id="HOHQaWqIaPFkLdt0L4mGTW">全部 482</span><span class="tab" data-page-node-id="DwsaOamQ1GgloAPMbgzodx">待审核 36</span><span class="tab" data-page-node-id="xFL329QEh0fgEHyWboCo9K">已通过 412</span><span class="tab" data-page-node-id="s9cMTcVef5scSn59OOPFrW">已驳回 34</span></div>
+    <table class="m" data-page-node-id="WyjqaJIiiwNS1P9EyH1D6Q"><tr data-page-node-id="l1NzDYzsReamk8Z6cHU6qI"><th data-page-node-id="8H3sdWaGdDC1e9XgXMpOHC">用户名</th><th data-page-node-id="ZxAJkKPR2aGa6OqhFnAY8J">认证类型</th><th data-page-node-id="vlMhoNnT32b9tdCPCIncSr">状态</th><th data-page-node-id="EycSJ0kcW8vuUHQp4qwQXT">申请说明</th><th style="width:110px" data-page-node-id="tUdf9r0BkDYrFQqzkqB2BR">操作</th></tr>
+    <tr data-page-node-id="H7qG050UtGGUs7yb2L2FVu"><td data-page-node-id="M5Lgp1G6J6N7MhocfTzuyT">用户G</td><td data-page-node-id="WDYFq5yLuu0thOBddS5B6w">创作者</td><td data-page-node-id="PJ5wiNDbx9HZTn8VcaeGh5"><span class="tag p" data-page-node-id="3kuPdapFrog4CH97ve76y4">待审核</span></td><td data-page-node-id="mHQEZwigIlGHCpnTPShF0S">独立开发者…</td><td class="ops" data-page-node-id="u0RdlSNYMqIdHjcrE4viEI"><span data-page-node-id="jTFYfXIABQA94fx2q1ZRuk">详情</span><span data-page-node-id="c5aAulOx4gdbZmUqJYMeFC">通过</span><span class="del" data-page-node-id="bnEoQrMg85ULjm2jRmRq3f">驳回</span></td></tr>
+    <tr data-page-node-id="RbgSfDM9JJTHCb2G78d2WG"><td data-page-node-id="4E7r0SJhH0PQoZFpQT9hRG">用户H</td><td data-page-node-id="5fopWF8YSZ6XSkQ0XJNsm0">品牌方</td><td data-page-node-id="9xb5fovgxaDz7xhFW29vde"><span class="tag p" data-page-node-id="chTtuAUBkoDlSqP0Vz33Lz">待审核</span></td><td data-page-node-id="6RFmk9SLY17QzxT8DdLiWS">官方账号…</td><td class="ops" data-page-node-id="awujWOGrCnW5dnx7G6S7xS"><span data-page-node-id="XJdjNp4arLs4E0iWXPu5tA">详情</span><span data-page-node-id="DwXDuO4cYj81MSlXHyyoWL">通过</span><span class="del" data-page-node-id="GkXxmlGqrkAiwhsCuqSe50">驳回</span></td></tr></table>
+    <div class="note" data-page-node-id="wDyv45QfZB5UgfiA7B6T2B">「详情」抽屉：用户 / 申请说明 / 状态 / 申请时间 + [通过] [驳回]</div>
+  </div>
+  <div class="card" data-page-node-id="BncS0fNC1B2CXzHwYDKG04">
+    <div class="wf-head" data-page-node-id="K8aFO09DBOnWyiKcOEZoOs"><b data-page-node-id="3E5ofDLQLhcHH8uaF92JfX">用户管理</b><span class="route" data-page-node-id="NZCOx40TpCMygk9muyiDEa">/user-management</span></div>
+    <div class="hint" data-page-node-id="eI5ddqRdFUPHonHT5FOdY7">用户治理与处置 · 4 维筛选 + 详情/编辑抽屉 · 共 8,912 位用户</div>
+    <div class="filters" data-page-node-id="y0yqyz0Pf2oQYAIbDhHmVj"><span class="fld" data-page-node-id="SEKoCOhCfdlranMKQFSup2">状态下拉</span><span class="fld" data-page-node-id="zgSlSLABePooUIfodfRYrc">角色下拉</span><span class="fld" data-page-node-id="PhTT2VOazCHjFE357tzEnW">异常标记</span><span class="fld w" data-page-node-id="9ahrwmhFpPxmdfcB5OelXe">昵称搜索…</span></div>
+    <table class="m" data-page-node-id="f41wzHvPdNnOCGfWHiqCh1"><tr data-page-node-id="1JpWsLupXgxqnOIWNVmWFk"><th data-page-node-id="9CNOcrAgqSCDEcwxdvpDOy">用户</th><th data-page-node-id="akXdFzr6PVmV2hQkFDYfdf">状态</th><th data-page-node-id="PlYXAT02D0toivlmkXmKMo">角色</th><th data-page-node-id="LNc2enEltj0tGucThJsQQv">异常</th><th data-page-node-id="r3Qjxf4jhPHHnacqkUtvWO">处罚次数</th><th data-page-node-id="lhW5S6LaChDTEt98ZjBXyX">注册时间</th><th style="width:130px" data-page-node-id="GtJAghVY2xxdnDEXfM3aJ0">操作</th></tr>
+    <tr data-page-node-id="ZRCWxuAO8LHWKv0oVmiYV4"><td data-page-node-id="cGK9lBxlz6IlpoXHZOeA4g">头像 用户J</td><td data-page-node-id="ZRKyF5HsLiI7kWG0vBpaiy"><span class="tag g" data-page-node-id="cqfhi3CDBt2KMQMAY4v36L">正常</span></td><td data-page-node-id="F92PxE8QMEGr9nHHtDh81q">普通</td><td data-page-node-id="GX7cHffC8kXa0JdQAXEIDJ">—</td><td data-page-node-id="0Jzo0lWqHCGzGjpFBC9sve">0</td><td data-page-node-id="LrMwQw8rDNyrloiTyLGP2J">2026-08</td><td class="ops" data-page-node-id="oeiCjPxwbALTBE6f7WUfAM"><span data-page-node-id="50HFBevAnb4KYUGbvzOkU3">详情</span><span data-page-node-id="RRsnkqQunuIVJQjPKbb4Mg">编辑</span><span class="del" data-page-node-id="5yXXcAzB2KigcpNFPWgFjD">封禁</span></td></tr>
+    <tr data-page-node-id="t412xnEGaqbCARUjrL2Xgh"><td data-page-node-id="Lf2JCeTXqBgjdTGvu1tE5P">头像 用户K</td><td data-page-node-id="xg5ZKSJlmAH7DQr5gRsyDK"><span class="tag r" data-page-node-id="S30SutupWXLJPfuQ8NjmYB">已封禁</span></td><td data-page-node-id="EDn8pDOVNiVqChAVNyaARP">普通</td><td data-page-node-id="FO1Bl3U1TBjTJPFuTGnDVE">刷屏</td><td data-page-node-id="QyGo5Frj9JUPZvFqVk6AoF">3</td><td data-page-node-id="f7cEhBBZjpDZHWIGYG5seR">2026-06</td><td class="ops" data-page-node-id="AiN7YB4sSFITgxzUz1i8gY"><span data-page-node-id="ZC5CfaC9X6jyBOJaPMCxcC">详情</span><span data-page-node-id="5bPC97pEZdFpO7OD9zI1h1">编辑</span><span data-page-node-id="68YwQG9h5xAwHkBBKpkNYK">解禁</span></td></tr>
+    <tr data-page-node-id="kJfd6h7nvT9taMiCtE71sh"><td data-page-node-id="ncKi0yLhyCVlLnyY4Fucyo">头像 用户L</td><td data-page-node-id="zBGO8BeDzPE1ZR5a5uKUdN"><span class="tag p" data-page-node-id="nOL5HKkAHljnm69fYDI8Pu">限流中</span></td><td data-page-node-id="eSHl3wiKnETizSyVdk1b5k">创作者</td><td data-page-node-id="zeTNsE7Ef9yvoQ0DgOpU3L">导流</td><td data-page-node-id="KJ4uN582m5ik0u5mWdJbzE">2</td><td data-page-node-id="1BuMb3fn3QIyP7glMowmmE">2026-05</td><td class="ops" data-page-node-id="WlYUaBv0tVBCa5HJli92c6"><span data-page-node-id="tK3Ju7HdK7p7LQmavgzpg3">详情</span><span data-page-node-id="EgKZePCavTZEfARKG3YZVD">编辑</span><span data-page-node-id="CvYJeuj5nhhGp4IKsmIob6">解除</span></td></tr></table>
+    <div class="pager" data-page-node-id="005QwBPbigo8q0rtwUTB5z"><span data-page-node-id="3yAnkAVSCA3MC7pfVe4Ehs">每页 10/20/50</span><span class="pg" data-page-node-id="UXTwRfFhg0FBdpsmztLYGF"><i class="on" data-page-node-id="9OHa4ETaCMlCXrNgTDRGLA">1</i><i data-page-node-id="vYG2lY3G9yenYErXlIBZZM">2</i><i data-page-node-id="Zf4vhT9yOA0fG7nhkqFnSF">3</i></span></div>
+    <div class="note" data-page-node-id="DzTkSGi5JtyVFO4kxYfRIs">「详情」：资料/状态/封禁至/限流至/累计处罚/历史处罚记录 + [封禁] [限流]；「编辑」：昵称/角色/积分</div>
+  </div>
+</div>
+
+<!-- ④ 举报与申诉 -->
+<div class="grid2" data-page-node-id="YZbNKlaGwfWW9ngWhF69Bg">
+  <div class="card" data-page-node-id="QQgJtx5OueTsiWO4uQqIVu">
+    <div class="wf-head" data-page-node-id="mH3gRkl0VmZETwF9W3JW8c"><b data-page-node-id="XZE4OJeKncA7KkTUcAzedR">举报处理</b><span class="route" data-page-node-id="yeBDulSJIMFHhXAdfL1OYV">/report</span></div>
+    <div class="hint" data-page-node-id="tHDTjYmnb5LYJb1ZjDdBgr">举报工单 · 工单号追踪 · 单号一次处理 · 动作在详情抽屉</div>
+    <div class="filters" data-page-node-id="iefHU2murbBtoBHDmdonPM"><span class="fld" data-page-node-id="Ip2Ekn0bEAgELG692b1uRY">状态</span><span class="fld" data-page-node-id="3LZSTJje94iGKM305D1ZI4">内容类型</span><span class="fld" data-page-node-id="8lEIMzTZtEDu8CkgjCJJWo">举报原因</span><span class="fld" data-page-node-id="9kAEl6ZBHJnGlWrE3iWm0A">重复举报</span><span class="fld w" data-page-node-id="c5coONTmpIr2JdiEwQeZdv">搜索…</span></div>
+    <table class="m" data-page-node-id="MescGS6FBe8BY0AFA90C3r"><tr data-page-node-id="2gcyYoB4qeWEwPvAfCxzEw"><th data-page-node-id="fG9X2v3mv0cAu7nsMlDltg">举报编号</th><th data-page-node-id="7vVJHEis2UfsDF1ceAnSse">内容类型</th><th data-page-node-id="sMvfNMKoUypSa0532envTt">原因</th><th data-page-node-id="xyGL1K6p9oZrHUNSRVuSjS">举报人</th><th data-page-node-id="CJA1IAINqCzcP6WPeki2aH">被举报人</th><th data-page-node-id="uw9hfFBQB5AzMTevbCBNQc">状态</th><th data-page-node-id="Gl7KvGxwFBmscyunzYrPNH">重复</th><th style="width:60px" data-page-node-id="yeIN1O8pznGcxHZDu6YDGL">操作</th></tr>
+    <tr data-page-node-id="6Ni0C8YHFoCHQcxX3md8h5"><td class="route" data-page-node-id="KSwTbEFR3MnwNudSOI4q59">R-20260906-01</td><td data-page-node-id="97OpoAy3or52jqpVnhF1fu">帖子</td><td data-page-node-id="E9j4Fwgpujl9HHjk6Qy73X">刷屏推广</td><td data-page-node-id="AWo1akt8FYlGzZVBKBtHul">用户M</td><td data-page-node-id="OrnL9cgFslCJxozMwZLmFI">用户N</td><td data-page-node-id="CVEuhVW46crSD8TaLIgmz3"><span class="tag p" data-page-node-id="Hbkc6HHFKrgqr7Dr1tsBW7">待处理</span></td><td data-page-node-id="RbTwv6TJeYTizuBbvTqhAM">×2</td><td class="ops" data-page-node-id="pHKM3l6dMGMl3PK9oVzHg0"><span data-page-node-id="znVwc26SBwqH2oNjnjWpzS">详情</span></td></tr>
+    <tr data-page-node-id="9V62Wxa5UA6rn89bqCldsj"><td class="route" data-page-node-id="nS1V8BJ89FEKKmnYBQi1tW">R-20260906-02</td><td data-page-node-id="a4NDOUVndZ8Achr9Ir0XHP">商品</td><td data-page-node-id="F5oa5rcb8OOTvXyfy0yTx8">虚假宣传</td><td data-page-node-id="VESM9U5GhGycY38Laly4g8">用户O</td><td data-page-node-id="mfVxRwSodq5rRKUgSFGrJB">用户P</td><td data-page-node-id="m2Fdvnnql1eWYQfsavxZJk"><span class="tag p" data-page-node-id="20hk7dMugJMuuhb67v9qSs">待处理</span></td><td data-page-node-id="AkFcIuDhxIzsHvI1P1epeO">—</td><td class="ops" data-page-node-id="iWwCYxxfenwswX38dwW1vg"><span data-page-node-id="LOWRovY7PVUNYoDlyzSWZR">详情</span></td></tr>
+    <tr data-page-node-id="RfS8ZIIHVHkm3daHFKg6Gb"><td class="route" data-page-node-id="ez1TZFDEpJ3YGCPh5n0wea">R-20260905-18</td><td data-page-node-id="0bSCGIWqzvzk2lCJVIklN9">链接</td><td data-page-node-id="9HBRFYW6UCesvRqkYUvza9">外链导流</td><td data-page-node-id="pOGLwSZgsuFRAUXijYtS6Q">用户Q</td><td data-page-node-id="Oyfzibt3bFjfTH9OnFDReU">用户R</td><td data-page-node-id="CfgaG4VecHAtqovduIF8QI"><span class="tag g" data-page-node-id="WBhJMyxQc4zX8HdLC8Q1bl">已处理</span></td><td data-page-node-id="KZOk8mwGOvxlkw8NjICOBY">×3</td><td class="ops" data-page-node-id="G1cx2dvWvNvK76NkO8p61r"><span data-page-node-id="LQaY9HG4x1dh1PLg2wFsvt">详情</span></td></tr></table>
+    <div class="pager" data-page-node-id="1y7EGQhzmKm9yir1QtOFgs"><span data-page-node-id="QhFAHNuVDpKQDdXeM1seHP">每页 20/50/100</span><span class="pg" data-page-node-id="UWdaPmy8AtUhIiTXjRSYSs"><i class="on" data-page-node-id="OgmudjFYLbieHnOqlkfTXX">1</i><i data-page-node-id="3ANuDq5dYP52qgeF6RLqCQ">2</i></span></div>
+    <div class="note" data-page-node-id="onD2a0Soy6ElGWhABxDP4n">「详情」抽屉：举报编号/原因/双方信息/举证 + [通过举报] [驳回举报]</div>
+  </div>
+  <div class="card" data-page-node-id="BAZHRDCrfwOLmSx1pqiQJ7">
+    <div class="wf-head" data-page-node-id="UswPVxeVr9XvyUlfPA7ySY"><b data-page-node-id="6zdLYRPCLJhUDaJhsTqfDx">侵权申诉</b><span class="route" data-page-node-id="uNA5rronPT1Rg66e0sziD1">/infringement</span></div>
+    <div class="hint" data-page-node-id="P0j7OE7QqPZuqCEf1egNXQ">对处罚结果的复核申请 · 处置后不可再申诉</div>
+    <div class="tabs" data-page-node-id="D5xnnOpkgM2U77bYrnFVE2"><span class="tab on" data-page-node-id="Qn5adhqxdArlbIxoj72cJ1">全部</span><span class="tab" data-page-node-id="PGRkmudNnnDyRaHxPT0Un3">待复核</span><span class="tab" data-page-node-id="j8zkBb4jpIeioljttmn23m">已恢复</span><span class="tab" data-page-node-id="edzkwArEiCBuf3poVtVOEa">已驳回</span></div>
+    <div style="border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin-bottom:8px;" data-page-node-id="VkLy6oGUGn9LmCfRCQuFF9">
+      <div style="display:flex; justify-content:space-between; font-size:12.5px;" data-page-node-id="TsYfVx75ZGER4fJD7sXAtq"><b data-page-node-id="zBWDsCRFjjvGTr1mzcBZvX">「用户N 帖子违规」的申诉</b><span class="tag p" data-page-node-id="3fI54pMHHZCEJnCZcAwnP2">待复核</span></div>
+      <div style="color:var(--tx3); font-size:12px;" data-page-node-id="s5mQgKcFi0QoQ1VRcnUc6B">申诉人 用户M · 标记原因：刷屏推广 · 关联内容：…</div>
+      <div class="ops" style="margin-top:4px;" data-page-node-id="Ew33GYY2KM6T20vfF7ec3o"><span data-page-node-id="XBdeklHZKNxE4HEjn8CgFu">查看详情</span><span data-page-node-id="62xaFZEeUuTJzglSeD3rpy">恢复发布</span><span class="del" data-page-node-id="Qz0vBvZT10Xb7PWKkLRaak">维持处罚</span></div>
+    </div>
+    <div style="border:1px solid var(--line); border-radius:8px; padding:8px 10px;" data-page-node-id="DwDnYgGomMOBLCyZ8CExEh">
+      <div style="display:flex; justify-content:space-between; font-size:12.5px;" data-page-node-id="0TLUzSDASnHVoRczaF74Ub"><b data-page-node-id="EMjS3x1hQYNMdVewejXhrK">「用户P 商品下架」的申诉</b><span class="tag g" data-page-node-id="4CWTP6a3YEx7Kys3TlCgfI">已恢复</span></div>
+      <div style="color:var(--tx3); font-size:12px;" data-page-node-id="uHmwRqnYj1NzQ878CCu3eL">申诉人 用户P · 标记原因：虚假宣传 · 关联内容：…</div>
+      <div class="ops" style="margin-top:4px;" data-page-node-id="M7YGsdqPgTWoAyo0yyo9v8"><span data-page-node-id="fU8Ts1cemrIIdDPyptDofe">查看详情</span></div>
+    </div>
+    <div class="note" data-page-node-id="0E9SdxqKFN81IQ1ph8fnkf">「查看详情」抽屉：标题/作者/标记原因/关联链接/申诉说明 + [恢复发布] [维持处罚]</div>
+  </div>
+</div>
+
+<!-- ⑤ 风控与规则 -->
+<div class="grid2" data-page-node-id="yI2T194TxMmBPs08oBGtqS">
+  <div class="card" data-page-node-id="AQ4sjGI7L039h2KsHphkyW">
+    <div class="wf-head" data-page-node-id="0ViSGlg7pWCmSIVcko5j0R"><b data-page-node-id="TSTHoDbOBFypXqhp3UvA5V">风控中心</b><span class="route" data-page-node-id="kcvfcumbCxhJ9utjXqlwR4">/risk-control</span></div>
+    <div class="hint" data-page-node-id="sitHcFdyS4NiOLoEy2aqpX">URL / 域名 / 上传 三类风险 · 统计卡 + 三 Tab</div>
+    <div class="stats" style="grid-template-columns:repeat(4,1fr);" data-page-node-id="OBovskStDRDcj4gMw9GFUP">
+      <div class="s" data-page-node-id="vzZ3DnPkWy3xMVDbjiAbYC"><div class="l" data-page-node-id="nmMY4C57BimmMnpRmKRvn2">URL巡检</div><div class="n" data-page-node-id="XVjihEgqFambtChbdhoNEv">1,024</div></div>
+      <div class="s" data-page-node-id="3Wc0TUNZPgT5fpbOGm8TlU"><div class="l" data-page-node-id="lu5EF1b53BxFvOMJ689UpE">高风险链接</div><div class="n" data-page-node-id="JHfPA80j18vrV53vfUsKKt">18</div></div>
+      <div class="s" data-page-node-id="IuW3Y5JMAB1bpupDPzXb5T"><div class="l" data-page-node-id="9kaGXJdiRoyWHJ8Ea7pHXw">黑名单域名</div><div class="n" data-page-node-id="TMHfQLaHlHuE2r9HACGJVg">42</div></div>
+      <div class="s" data-page-node-id="bAplDEoteKSvT8PCq7afyK"><div class="l" data-page-node-id="1jdIJK9vSxNwTG2gtKn5SE">上传审核</div><div class="n" data-page-node-id="b7T9vUoUj6ix3PWBaJB9I2">7</div></div>
+    </div>
+    <div class="tabs" data-page-node-id="fQqAAPnkMscEiYVwEy0va6"><span class="tab on" data-page-node-id="TWfnMv8zsL86vWkpXsy9ZD">URL 风控</span><span class="tab" data-page-node-id="xKDSTpRj4uTKqWnVsUDRJt">域名黑白名单</span><span class="tab" data-page-node-id="1hXBk16WCaXwKgFiDBrVj6">上传审核</span></div>
+    <div style="border:1px solid var(--line); border-radius:8px; padding:8px;" data-page-node-id="5Y6Zew1ASLYf9gliIZFlls">
+      <div style="color:var(--tx3); font-size:12px;" data-page-node-id="gTyGdJ5K8hxeoRI1gnM6TQ">Tab 1 · URL 列表：URL / 备注 / 关联用户 / 风险级别 / 操作 放行|封禁|删除</div>
+      <table class="m" style="margin-top:4px;" data-page-node-id="k8IPuyLUwLhVqRFN2KZ6Ed"><tr data-page-node-id="IL4NzhirbfwSYbUyzadV5p"><th data-page-node-id="IdC2Bl1AhKwXiWhozRdSIz">URL</th><th data-page-node-id="4wAcnSweFiWHHnmDURV39p">关联用户</th><th data-page-node-id="BVPOgdf57GSkjVz8xVDLPb">风险</th><th style="width:120px" data-page-node-id="H6KwzjXVRmusNwxs65GlJy">操作</th></tr>
+      <tr data-page-node-id="7MKRbMWzVLycY9oG3W4Qju"><td class="route" data-page-node-id="jk0rnL008dwd9ZJHA7grQM">https://…/p/abc</td><td data-page-node-id="pvoIBmdJjY1AvRzyoYaJzO">用户N</td><td data-page-node-id="DQV34hkM93DWQd7uS2jO5Q"><span class="tag r" data-page-node-id="6cCV5xeabNRaA4rg7a4CnF">高风险</span></td><td class="ops" data-page-node-id="Nfc1104RFXCGamnDivgP5R"><span data-page-node-id="4OaXWaNQRmS2J4os6nf8am">放行</span><span class="del" data-page-node-id="scIS7nwEtKuPu1gabjAjPz">封禁</span><span class="del" data-page-node-id="dDkvjbHJB7syDDm9kKtoMO">删除</span></td></tr>
+      <tr data-page-node-id="gs1IlECIw6d5n2y1vAgQG2"><td class="route" data-page-node-id="JpbMjq2YjNHHGEHhQnPzMV">https://…/p/def</td><td data-page-node-id="LbvsETpvTd9BvHKdH6tfJw">用户S</td><td data-page-node-id="2pIFA1MgXMOHmDySo7MY7w"><span class="tag b" data-page-node-id="iFqdoQVOmHWccTYQ1WL66d">可疑</span></td><td class="ops" data-page-node-id="p7hX0BOF2IwF1exLcKE8pb"><span data-page-node-id="7bNSAr3V4MrJ8pnjFqvjfy">放行</span><span class="del" data-page-node-id="O2Si2YInfWopHDCsqyJFVn">封禁</span><span class="del" data-page-node-id="08pCkxFtxaGZ8AWPLOgsPE">删除</span></td></tr></table>
+    </div>
+    <div class="note" data-page-node-id="AJDCpB8tYHuyNHp7Iwu6oy">Tab 2 · 域名名单：搜索 + [新增域名] + 域名列表（移白/移黑/删除）<br data-page-node-id="eqMHIM0e45agrgEa2bjOs0">Tab 3 · 上传审核：通过 / 驳回 行内操作</div>
+  </div>
+  <div class="card" data-page-node-id="HqgnzELThiF4fRqMFeBUKo">
+    <div class="wf-head" data-page-node-id="g21vbrEdROEt8VshN0HgrB"><b data-page-node-id="8Ct5qByQY12d2Q9eKY47Pv">规则与处罚</b><span class="route" data-page-node-id="CNCoc6QojSt2b6F2WKy58w">/rules</span></div>
+    <div class="hint" data-page-node-id="7KVuCMTyyXFS6ogQsIxHqy">域名黑白名单 + 违规记录 · 双栏 · 无抽屉 · 行内即时生效</div>
+    <div style="border:1px solid var(--line); border-radius:8px; padding:10px; margin-bottom:8px;" data-page-node-id="I9CELmxizggHtdhrTHon1I">
+      <b style="font-size:12.5px;" data-page-node-id="oZhF8Z8joUUodKIavvw1B5">域名名单管理</b>
+      <div class="filters" style="margin-top:6px;" data-page-node-id="RKlEGF28SA4dILVKJP53Sw"><span class="fld w" data-page-node-id="QNUF0vZMlXVFjpUIJeRYjD">输入域名 example.com</span><span class="btn" data-page-node-id="sTTjdL5rJzBbCEgxrzxMzZ">＋ 白名单</span><span class="btn gray" data-page-node-id="uKF7V16VmDAAIG33UR3kbA">＋ 黑名单</span></div>
+      <table class="m" data-page-node-id="r19Q0mXCOA4PHXzDU7pIlc"><tr data-page-node-id="xEApchq4XkgYrK1dbkUsd0"><th data-page-node-id="vPqXb1YhJzJqTlONuORLB2">域名</th><th data-page-node-id="rR7e37XHmaMRH6BYeLH3kH">类型</th><th data-page-node-id="QA0G4tTBdNlJUmyOirOhO9">备注</th><th style="width:80px" data-page-node-id="uubCSYKh5zt78DTVvbVPGM">操作</th></tr>
+      <tr data-page-node-id="GnKjuqPiqfq9pnMu1ZQ91v"><td class="route" data-page-node-id="68IDEY2U08LWIBMSNMQaOH">example.com</td><td data-page-node-id="aMS4RCDAEOOk3DguBJ28R7"><span class="tag g" data-page-node-id="UgFVr2Cmnj2ka6OCFVLaEO">白名单</span></td><td data-page-node-id="CAYon3yT5otLv8IqPkpmKn">官方</td><td class="ops" data-page-node-id="vsHeYi1Idn55EwKhPCGKan"><span data-page-node-id="2G6qj64dcMOHzt0taTnBRl">切换</span><span class="del" data-page-node-id="AtyMwouxlQABNWMTn6y01p">删除</span></td></tr>
+      <tr data-page-node-id="qSeOZzDcb0e1vHviORVx9Y"><td class="route" data-page-node-id="geRlVfIu8UNqVCE9GuDBOz">spam.example</td><td data-page-node-id="fulPZfFzARwBklcUI21qbe"><span class="tag r" data-page-node-id="bLPzUpUQaZqwH1KO0MwgMQ">黑名单</span></td><td data-page-node-id="fjHuty09uj64b8OxnbDkdK">刷屏域</td><td class="ops" data-page-node-id="lGhncBrMsl3vu3MwLabfcZ"><span data-page-node-id="ZRfQmCxWR2fyG1CwoLdPrq">切换</span><span class="del" data-page-node-id="qu4O4TvIcYqXw4Eh7HkWhU">删除</span></td></tr></table>
+    </div>
+    <div style="border:1px solid var(--line); border-radius:8px; padding:10px;" data-page-node-id="DpCxYN5sMi0hO6FT9hDvCr">
+      <b style="font-size:12.5px;" data-page-node-id="iyLQ2ZBeyPQVDP8uoXvHz1">违规记录</b>
+      <table class="m" style="margin-top:4px;" data-page-node-id="gTEk2cVl4mGkxiMg83Af2J"><tr data-page-node-id="tueDdWmQ6Z3rcuUhL5u2qd"><th data-page-node-id="o2CeRjrhCsNr4OV1Su3gSg">URL</th><th data-page-node-id="ZFduylUml63KYtLJnIMMBn">用户</th><th data-page-node-id="hGqSetyBH12qRNAQfWJANW">风险</th></tr>
+      <tr data-page-node-id="2GrJMWmBErJIjCz90dl66z"><td class="route" data-page-node-id="QhvpPVxg2MPz0OGf3t2Hn1">https://…/p/abc</td><td data-page-node-id="pAZOhVwOquqjhu2JR0l8hZ">用户N</td><td data-page-node-id="MJNTEzROnXb87r6yP0S5gI"><span class="tag r" data-page-node-id="7z8OtV0mb6sLHCrzjHGTuL">高风险</span></td></tr>
+      <tr data-page-node-id="FCZXDUTc9gIOjn6vBRVg6C"><td class="route" data-page-node-id="v6FjiW0NQai1nAlhZ7lLvk">https://…/p/def</td><td data-page-node-id="qlUTFiCP2opUzFMvVkIzu5">用户S</td><td data-page-node-id="Jk7bqPeoTNkVS0crTl7A9D"><span class="tag b" data-page-node-id="QQ16KQN2qVv26lgARNvcMD">可疑</span></td></tr></table>
+    </div>
+  </div>
+</div>
+
+<!-- ⑥ 活动 -->
+<div class="grid2" data-page-node-id="SRXs14FNZTmXGEeioEDnZD">
+  <div class="card" data-page-node-id="t2PlxrgoeoLtRymIEieLTl">
+    <div class="wf-head" data-page-node-id="pYdNT1Uxe72hUXI9opqg3O"><b data-page-node-id="62UybQKli4qXiiYU160CWI">活动上架编辑</b><span class="route" data-page-node-id="yzc80L849Vl38M1Mz84lub">/activity</span></div>
+    <div class="hint" data-page-node-id="8egIw3xGiFnwV20etlKM2Q">活动 / 公告 / Banner · 统计 + 列表 + 抽屉表单</div>
+    <div class="stats" style="grid-template-columns:repeat(3,1fr); max-width:340px;" data-page-node-id="SUG3NCpcpNDYQgFTG1RmKE">
+      <div class="s" data-page-node-id="Nlgee7sovSzEEL44XO4FCM"><div class="l" data-page-node-id="XIfvqQYneaUCCC4C4FF1TB">总数</div><div class="n" data-page-node-id="m7pbH3sCJyRRPs2J0ylO3R">156</div></div>
+      <div class="s" data-page-node-id="js0F5JSOlH5eFBPv4H5od7"><div class="l" data-page-node-id="d7TElb7H5Fegm4r0pV3vEt">上架中</div><div class="n" data-page-node-id="9TAqR2U417fKEOlcNqDS6h">23</div></div>
+      <div class="s" data-page-node-id="Ng8pPebmlCNEnzt5PHYWBY"><div class="l" data-page-node-id="lJN0uEOQSQ8mEYSgIXq73Y">已下线</div><div class="n" data-page-node-id="YJu8tRSbDU06uHAXonrg74">133</div></div>
+    </div>
+    <div class="filters" data-page-node-id="jKO7m5Kj0X7JAQ5wgUsBc1"><span class="fld" data-page-node-id="TyV01eYfpkh79CSsGot9jL">类型：全部</span><span class="fld w" data-page-node-id="YkMvstZhE5Y6ADI9gYqpru">搜索…</span><span class="btn" data-page-node-id="m4T49NZSa0fGCLURfuFko1">＋ 新增活动</span></div>
+    <table class="m" data-page-node-id="p4lB9R9Ry6SJBRIqAEH1UM"><tr data-page-node-id="7AxAKlWDy76zCP4pjVVAEO"><th data-page-node-id="XmPDJG0CywAh1ymY8s90Qt">标题</th><th data-page-node-id="eujSKd1bljX58kCpHBpRuA">类型</th><th data-page-node-id="twdcTFYb7fwDPBeBEymk3a">排序</th><th data-page-node-id="Wa1OUyImYUqOAhTbfFqPv8">状态</th><th style="width:130px" data-page-node-id="YFjRAX28E4kYHNDymbZn2Y">操作</th></tr>
+    <tr data-page-node-id="zBz0bMdIflbG38VkQiNBLP"><td data-page-node-id="4NM6UhsX2iSsJvS8rhq8Lf">引力创作者月榜</td><td data-page-node-id="ClUsZQ1nOLOb0zDUWxKXkC">活动</td><td data-page-node-id="V2wICIYC6K3i10zjLI5hVz">1</td><td data-page-node-id="Vf5MX1jZxWKer44RBj5XAN"><span class="tag g" data-page-node-id="Pyq8Scp4YyLHW6OdnjIdnr">上架中</span></td><td class="ops" data-page-node-id="A7qKLmKSt3huHPRfQnvK4W"><span data-page-node-id="bl62nmrGr3gvru64LhTiao">编辑</span><span data-page-node-id="Mq4CpbEHSI7v0e8RLcYYC2">下架</span><span class="del" data-page-node-id="WUg6ZlQT7cCFuHtDGg6iDL">删除</span></td></tr>
+    <tr data-page-node-id="9aNq2VpGjzpPwZMy7tqH2s"><td data-page-node-id="q3YWyfEluA8wqy4t75Xxg9">平台功能更新公告</td><td data-page-node-id="XzBQHFjgCnoSKQ2Zh26Z2d">公告</td><td data-page-node-id="OgKHVhHeaj1EyzwpVKLuB9">2</td><td data-page-node-id="3aLkLt8yMtAmu0aKoXj4tG"><span class="tag g" data-page-node-id="EmvnzeFU4goDiFB3PqQ37L">上架中</span></td><td class="ops" data-page-node-id="ehY5wnpqwnLYwEHVUpiaDD"><span data-page-node-id="FjR3kJq7gaCKPiFPI61M8D">编辑</span><span data-page-node-id="72fuXCm6n7KjWA30tnIIxd">下架</span><span class="del" data-page-node-id="VYYtuVquvNF1VNWDGlh2cL">删除</span></td></tr>
+    <tr data-page-node-id="Q0eD7Q9qvfYKSCI8WovlMy"><td data-page-node-id="DOf1dTx5BgLszxjHyS29YP">首页 Banner 第 3 期</td><td data-page-node-id="3FFnii1NAR2MEutY2mwxVw">Banner</td><td data-page-node-id="26p6dSwabZtdGCjWgqdKEY">—</td><td data-page-node-id="Zo5gPz798wATyxoRNIoe8G"><span class="badge" data-page-node-id="YYvzytbjXcJvu9va7NUNr8">已下线</span></td><td class="ops" data-page-node-id="gQTqO0jwxEaGTWIwwRmiYt"><span data-page-node-id="SpGZ5QhssLcID1DaAckgJf">编辑</span><span data-page-node-id="F3CdYzmXUglnLC8iril3Rv">上架</span><span class="del" data-page-node-id="NRj3rtxxwSEjFQFI2LEYeo">删除</span></td></tr></table>
+  </div>
+  <div class="card" data-page-node-id="0DiURFFdCbytkUdouN6JzM">
+    <div style="display:flex; justify-content:space-between;" data-page-node-id="RLWeeKCXoIZpq07YBUjwgQ"><b data-page-node-id="sbdGoEGbjLW5Hu4tkbBjC4">新增 / 编辑抽屉（表单）</b><span style="color:var(--tx3);" data-page-node-id="5VblDVYq1DdrWXt8CxV9bL">✕</span></div>
+    <div style="margin-top:8px; display:flex; flex-direction:column; gap:8px;" data-page-node-id="zyuRKfwrO3VflmdUbj73fy">
+      <div data-page-node-id="yeGDYAXqF4suVsJ4fkH0vR"><div style="font-size:12px; color:var(--tx3); margin-bottom:3px;" data-page-node-id="9DceeUEHI2jhPXU2EzeHYQ">类型（枚举）</div>
+        <div class="filters" style="margin:0;" data-page-node-id="tGrh62vMGEhJuia0p9CEYE"><span class="btn" data-page-node-id="YJTPcWTMgLLaOZNwpNgfpZ">活动</span><span class="btn ghost" data-page-node-id="SnN26VHAnwpd0GqEAqZCAV">公告</span><span class="btn ghost" data-page-node-id="6qr7aTIWYfbE7vOBhWPDQW">Banner</span></div></div>
+      <div data-page-node-id="2xd1qRIfsfzzt9FALLEjky"><div style="font-size:12px; color:var(--tx3); margin-bottom:3px;" data-page-node-id="CLz12L1LVVOpslnoOA4Y3L">标题 *（≤100 字）</div><div class="fld w" style="width:100%;" data-page-node-id="hEypSzhgRNcDDMf87yIWWH">填写活动标题</div></div>
+      <div data-page-node-id="nZ6GtIASWKenGtfbZd0R8b"><div style="font-size:12px; color:var(--tx3); margin-bottom:3px;" data-page-node-id="WtSPiUAOZgp9kfJW3HPKyE">描述</div><div class="fld w" style="width:100%; height:48px; align-items:flex-start; padding-top:8px;" data-page-node-id="ZtYEEQtXLYpS2KGI46Niv6">填写活动描述文案…</div></div>
+      <div data-page-node-id="8OPvRx9h5tC3eYYL7J601L"><div style="font-size:12px; color:var(--tx3); margin-bottom:3px;" data-page-node-id="jgaHVaAmF0D3Ess0wgWJg2">排序值</div><div class="fld w" data-page-node-id="TRbEU8pkV6F7TnoFkf0aAe">0（越小越靠前）</div></div>
+      <div data-page-node-id="phVDlPWiVRJ2Kk7tOod5VB"><div style="font-size:12px; color:var(--tx3); margin-bottom:3px;" data-page-node-id="zZCnlsOJllxLOisyPY38UM">上架状态</div><span class="btn" data-page-node-id="YxnMBVSzHL9B8CFDnzBQoY">上架</span> <span class="btn ghost" data-page-node-id="5oXMBfdNizdfVQ4Npo9W5d">下线</span></div>
+      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:4px;" data-page-node-id="8w2AH5Xd88h5E08FqKRPaw"><span class="btn ghost" data-page-node-id="ni5E1mPD3WcSFwWAmNk3Hj">取消</span><span class="btn" data-page-node-id="IBeEnsSKC6MCdoTBlEE9CI">保存</span></div>
+    </div>
+    <div class="note" style="margin-top:10px;" data-page-node-id="NBJm294bbwb3UC6XcpLDmm">保存 → Server Action（zod 校验 + 权限 + revalidate）· 类型/排序/标题为内容审核之外的运营写操作</div>
+  </div>
+</div>
+
+<!-- ============ 四、分类布局 ============ -->
+<h2 data-page-node-id="zXgLHnyvrgDcNJ9DlLPgwv">四、功能模块 × 架构归属分类</h2>
+<div class="hint" data-page-node-id="W2sUkwFmjYlWf1rM8QgnSL">每个功能页面对应一个业务域模块目录（自包含八槽位），归入同一模块分类。代码目录与路由 URL 的对照见 ARCHITECTURE-PLAN-DIRECTORY.md。</div>
+<div class="card" data-page-node-id="mYuOx0SLsgTbGSEZ3tY9Dw">
+  <table data-page-node-id="5CN9Ujt3ePUSqS83YMfuLg">
+    <tr data-page-node-id="oAkLFC7sVaX7L5Wu59uglg"><th data-page-node-id="1RrL3ICH7aLeVzhdvLl4WE">功能模块</th><th data-page-node-id="pNjHKVR3mK7zQx7BhNUw1m">页面 / 路由</th><th data-page-node-id="cxNqFR1no8CtcQhyE6vRDJ">业务域 modules/</th><th data-page-node-id="guAvkG8VY4u4F6sOEQGjOO">页面形态</th><th data-page-node-id="NBFA6Wc92fuowezAMXyGSK">主要写操作</th><th data-page-node-id="0SxuWjWrnfitdBDVqPxblQ">迁移状态</th></tr>
+    <tr data-page-node-id="zzDSfMhdiHTqCUgg37pNP3"><td data-page-node-id="Oe0ST0sj4N2i5bCZmJFVMi"><span class="badge b-brand" data-page-node-id="pZ9Hc6ldEtOk5YRcFE5S1E">① 工作台</span></td><td data-page-node-id="Z1lpid80eqWjZTiZQVno9K">治理总览 <span class="route" data-page-node-id="gD13dkL020cGp5V8Ni9Um1">/</span></td><td data-page-node-id="FXMKbdxDukba20D0tjvNlt">overview（只读）</td><td data-page-node-id="M06ctCrYECffkJhom2EPCW">统计卡 + 图表 + 列表</td><td data-page-node-id="sJQ3ZF3aBObjZHKz1bUkHK">无</td><td data-page-node-id="xi4zQCo3hZz0lLwwzzbz95"><span class="tag b" data-page-node-id="e0oyxCIWi4kxQUuWDQ2njc">待迁移</span></td></tr>
+    <tr data-page-node-id="OVlzFT2xDLCgYFD4rkFoIB"><td rowspan="2" data-page-node-id="qnns6dzwOs3AUCTucGXnWO"><span class="badge b-brand" data-page-node-id="oVWjSBI4ZrDdLC7lDd6ZE0">② 内容与商品</span></td><td data-page-node-id="BylN9tjYU6W2EGmgJRgY0A">内容审核 <span class="route" data-page-node-id="ScFTsysHoWDrSd3pksqIcM">/content-review</span></td><td data-page-node-id="ft8yvO5dTs3LBrSGoGavtL">content-review</td><td data-page-node-id="6eha30YtXAszTpeRFfDmjT">筛选 + 表格 + 批量栏</td><td data-page-node-id="YzdCJQNaCJtMNCHkFoiv7A">通过 / 驳回（单条 + 批量）</td><td data-page-node-id="vEgYasXPG4Bxy4VpTvcM6u"><span class="tag b" data-page-node-id="q0jd5ZcflUlVzmjbPbXk4t">待迁移</span></td></tr>
+    <tr data-page-node-id="VdBC5Pc8MBAhEC4ffk2CaE"><td data-page-node-id="DonDRMAW9267WrrE8zH7tQ">商品治理 <span class="route" data-page-node-id="JAu3dFWs6RxuioHJGM4vUc">/product-gov</span></td><td data-page-node-id="zKHtXQIG338qhLzpdd7iEv">product-gov</td><td data-page-node-id="W2dcFQPrZbW3dX34T5z7uT">统计卡 + 表格 + 双抽屉</td><td data-page-node-id="ZeczbRcOxOSGLkHGADABHC">新增 / 编辑 / 删除</td><td data-page-node-id="voF4vSKyfmW6ZoPCDTcxod"><span class="tag b" data-page-node-id="WKkpvveALbHohTZeTZitBz">待迁移</span></td></tr>
+    <tr data-page-node-id="HsSEB728NJWSm0Kw7cz308"><td rowspan="2" data-page-node-id="6wHlpQr4FogcO9T8GnMPP8"><span class="badge b-brand" data-page-node-id="TJAIcReoPyFwY400jxaWxE">③ 用户与认证</span></td><td data-page-node-id="Yyad3ai3h80fNC7Fr3ANbE">用户认证 <span class="route" data-page-node-id="ISSkt3ZThYFchZcTkjVIxK">/user-auth</span></td><td data-page-node-id="LNa11bj6rpkPmyH1H8beXE">auth（认证域）</td><td data-page-node-id="BF8CfCt1XQ0wlhITWw6axq">统计卡 + Tab + 列表</td><td data-page-node-id="hbcyciZUJubMd3N5DfNsAH">通过 / 驳回认证</td><td data-page-node-id="BGYXYfb6Z4uIcA74ja303N"><span class="tag b" data-page-node-id="OR7YsD2W3SrferBfMm16bj">待迁移</span></td></tr>
+    <tr data-page-node-id="otbeXAgQuOa58ZtjkwKc6G"><td data-page-node-id="QGLEjdRGflkcCCXt41iBXf">用户管理 <span class="route" data-page-node-id="ddDZKaIqTugFaAAR9yIFHU">/user-management</span></td><td data-page-node-id="OpRwqcexJOpPqjW7u2vzjn">users</td><td data-page-node-id="TmjKCwj9qAKTKlHEql8gHH">筛选 + 表格 + 双抽屉</td><td data-page-node-id="bcsa8UhZw2Q3RULhz3RzEQ">封禁 / 限流 / 状态流转</td><td data-page-node-id="shzNRlcUQQVoMHkkE7NJrU"><span class="tag b" data-page-node-id="J34k3Dxsc9AHySk7dgaBcF">待迁移</span></td></tr>
+    <tr data-page-node-id="Domnn4ZnWNRSzVNDivrHB7"><td rowspan="2" data-page-node-id="OdTXoGFZiCgsjg7xq1VspB"><span class="badge b-brand" data-page-node-id="VUBICBfKKukNYBDZUnwcQV">④ 举报与申诉</span></td><td data-page-node-id="8PPTrVMXzc6tHUCNsxZ80F">举报处理 <span class="route" data-page-node-id="A798Oy8z6T854jvH54YMOy">/report</span></td><td data-page-node-id="G0Zv2QELAeaFgDx5mMBYk0">report</td><td data-page-node-id="ET5v6WRbb8YL0sY6Jhdrx7">筛选 + 表格 + 详情抽屉</td><td data-page-node-id="4HucFult3TMxTBnrCDTQTV">通过举报 / 驳回</td><td data-page-node-id="F0P3boGtR0cIHI4QHOccfx"><span class="tag b" data-page-node-id="ZYyVmSyCDlLbWApWj639vY">待整体迁移</span><span class="tag g" data-page-node-id="Ij7wsAkvoZrqoXUPnSGYFJ">P0 已处理</span></td></tr>
+    <tr data-page-node-id="f2DFuhipbYmc2Iyg04XOmp"><td data-page-node-id="ITRLqZBh4Qz5DskMcJMtiq">侵权申诉 <span class="route" data-page-node-id="ELhFjhhxxdFGFtqVr5Q9AH">/infringement</span></td><td data-page-node-id="DdUXkTxT9EMezd1DcjXxn5">appeal</td><td data-page-node-id="AoFYC6AQdVQrdRPXCrWuGp">横幅 + Tab + 卡片列表</td><td data-page-node-id="CXEcEKAKlGFnH4fuWcn4EW">恢复发布 / 维持处罚</td><td data-page-node-id="PR48kWS2TfjocupoJEen5m"><span class="tag b" data-page-node-id="P19ibw9yGpjQzHZNNqBiH4">待迁移</span></td></tr>
+    <tr data-page-node-id="4YrRJWPHXyPcfltBRFaBjd"><td rowspan="2" data-page-node-id="RFxi5KoZ5pg1mnaMZIcgau"><span class="badge b-brand" data-page-node-id="SqlA3zKgI4j9AivUurUrE7">⑤ 风控与规则</span></td><td data-page-node-id="AHd5qo5plpmTF4izpfBQ6A">风控中心 <span class="route" data-page-node-id="F5t9wlPvJXr1Kmi32lIbRz">/risk-control</span></td><td data-page-node-id="ZTOUqz3Eyyd9SkSZsA1hpx">risk</td><td data-page-node-id="xzvgSp882XgZh19IAk8V8M">统计卡 + 三 Tab</td><td data-page-node-id="2kZRyMVifpne56cnE8GPCV">放行 / 封禁 / 名单增删</td><td data-page-node-id="owcOziub23y270QEQI1LRC"><span class="tag b" data-page-node-id="Ut0B7pAxBDhfxs7twxDNjI">待迁移</span></td></tr>
+    <tr data-page-node-id="XXi8qFbRdy3sEGdHx8aDUl"><td data-page-node-id="EXoVWbNtfnnpTr9KhUejeB">规则与处罚 <span class="route" data-page-node-id="OWOsoXelJH7koYhPY4jNa3">/rules</span></td><td data-page-node-id="L37wzEj4utMTmMlGns2lWE">rules</td><td data-page-node-id="du0ne05N6y4ZgTelemz2f6">输入栏 + 名单表 + 记录表</td><td data-page-node-id="1zdMv5T90537DcxMIHivEV">加名单 / 切换 / 删除</td><td data-page-node-id="5jTlxiLTpX1yCKAO5F268B"><span class="tag g" data-page-node-id="24LB5qCcFaUAPrCpeArvXR">已迁移（试点）</span></td></tr>
+    <tr data-page-node-id="v8CUR42U0vTNH8B512xZa8"><td data-page-node-id="XNlK3ImjE6v9lEk7WFu1F3"><span class="badge b-brand" data-page-node-id="DxghelgcTeX94a2YYOcBq4">⑥ 运营活动</span></td><td data-page-node-id="OYOLBobAreh3CNk6pZzbNr">活动上架编辑 <span class="route" data-page-node-id="iKMkrvgEjwljSOgD2kL0Ii">/activity</span></td><td data-page-node-id="f8ZEC7m5dRo3S1ms0UgSwC">activity</td><td data-page-node-id="6lqUsyqIWHjXzkTlFUIolg">统计卡 + 表格 + 抽屉表单</td><td data-page-node-id="PAo5o7TV9V7BIDdcLCHae8">新增 / 编辑 / 上架 / 删除</td><td data-page-node-id="FEvKVG8JhDUImy0VyK6fCI"><span class="tag g" data-page-node-id="DJcuKWdVGOSEXf1Z0pBPFY">已迁移</span></td></tr>
+    <tr data-page-node-id="tkzJsHCM1pmxdPnB3Vsq4l"><td data-page-node-id="O8dfd8rs7ANamKYHItNTKH"><span class="badge b-danger" data-page-node-id="BgJjaSohlqDjxlt7RHIjnS">前置</span></td><td data-page-node-id="GBEC1zhKW7JqOpqzqInCl4">登录 <span class="route" data-page-node-id="cztCwHnVWBAlac54oRrt0J">/login</span></td><td data-page-node-id="5qx9URbhi9PmRJFF1CHp9f">lib/auth（会话）</td><td data-page-node-id="v7MP9y7cGFHNmQYsYCQ0O4">独立卡片表单</td><td data-page-node-id="rOviRJBnBg3RDk6MFiu8Jm">登录 / 登出</td><td data-page-node-id="Sp4kKBylzeUAiHJ6mapesz"><span class="tag b" data-page-node-id="U0HdQsDSbJ1FcayjgiyzC1">待迁移</span></td></tr>
+  </table>
+</div>
+
+<!-- ============ 五、架构分层 ============ -->
+<h2 data-page-node-id="5wIYDYfITwcYHUqH9vqx8Y">五、整体架构布局（五层纵深）</h2>
+<div class="hint" data-page-node-id="1I0CZ824xBGbtw0wOAzje8">自上而下单向依赖，禁止反向引用：路由层 → 业务域层 → 数据访问层 → 基础设施层 → 数据库。这是目录整理方案落地后的稳态。</div>
+<div class="card" data-page-node-id="0Q3JUVlFsTCClTHvMKYnzs">
+  <div class="arch" data-page-node-id="K91YVxfjiNTvzZPzEn0L2w">
+    <div class="layer" data-page-node-id="xbM4aurYysBMxTywa2bjyC"><div class="ln" data-page-node-id="PTMlhlFDUEJO3e7qFaUaev">① 路由层 app/</div><div class="lb" data-page-node-id="o5JC9ujnHTceDDsnKOMoPU">薄页面 · 每路由仅 page.tsx · 服务端解析 searchParams + 鉴权 + 调模块 queries · <span class="chip" data-page-node-id="Do1NZbSj5AAlAUbkiOac29">/login</span><span class="chip" data-page-node-id="wlswDlUw3kpIuG1UdT3q60">/(dashboard)/… 共 11 页</span></div></div>
+    <div class="arr" data-page-node-id="8H4v46e4TD5P1McwEZAuCe">▼ 读：调模块 queries（RLS 客户端）&nbsp;·&nbsp; 写：调模块 actions（Server Action）</div>
+    <div class="layer" data-page-node-id="FtrAZnQiytkETCGUJgGSFV"><div class="ln" data-page-node-id="uJB6Mr39ytKHsU8V6H2x1J">② 业务域 modules/</div><div class="lb" data-page-node-id="wx3N9NBGeGDazTUsCPPo4S">一个后台功能 = 一个自包含目录 · <span class="chip" data-page-node-id="5XFrl6JI185A33yU5cngHv">index.ts 显式导出</span><span class="chip" data-page-node-id="1pMYozZkwc0nBBDcUldqAR">types.ts</span><span class="chip" data-page-node-id="M3kUH1D9hQIR9EBW81H19K">schema.ts zod</span><span class="chip" data-page-node-id="HQ76zgkgWtUm6KpNLD09sC">policy.ts 授权</span><span class="chip" data-page-node-id="eCAmEV0AQDnyUNARscP4nr">mapper.ts 映射</span><span class="chip" data-page-node-id="g2Adtd1L0AMaBA60G6FXXy">queries.ts 读</span><span class="chip" data-page-node-id="VqO4a6dJYGtU0Cia0V3WNQ">commands.ts 写</span><span class="chip" data-page-node-id="zApJkoOyq4oYpu99cxYCBR">actions.ts 动作</span><span class="chip" data-page-node-id="NdqYU8RN7MNLZyWR3q8B8S">components/ 视图</span></div></div>
+    <div class="arr" data-page-node-id="GKxUte7x2z7WJpfqE3YUWD">▼ 经受控客户端工厂（禁止页面/组件直连）</div>
+    <div class="layer" data-page-node-id="RaAv1PcyxhNLSEtHJqzHlD"><div class="ln" data-page-node-id="SSY1cKIqUBSiVLMRj6AKyi">③ 数据访问 storage/</div><div class="lb" data-page-node-id="1pJKBbYnpWJQBJZZlwGOkM"><span class="chip" data-page-node-id="IYABPCW8QRExgWUTERgWyn">getSupabasePublicClient 匿名</span><span class="chip" data-page-node-id="wcuVbtHyhoKY9LEAbgDFNd">getSupabaseRlsClient 用户态（读 → RLS）</span><span class="chip" data-page-node-id="utnvyZ5EWSPZmNxMBgNSvu">getSupabasePrivilegedClient service-role（写专用）</span></div></div>
+    <div class="arr" data-page-node-id="ItGevzDxkMzLCPcU47aHGv">▼ RLS 兜底 + 行级安全</div>
+    <div class="layer" data-page-node-id="XUeosXImZ1UHx5JwRNeNtp"><div class="ln" data-page-node-id="aeEoj1EDJ5uhv9EAINGVb1">④ 基础设施 lib/</div><div class="lb" data-page-node-id="DUISqOJxfPXxivbkh6xMce"><span class="chip" data-page-node-id="7puFi0szE52p0R4zNgpo4o">lib/auth 集中权限层 policy/permissions/context/errors</span><span class="chip" data-page-node-id="Ctzvb7E374HzL16wD2Ux64">db-types.ts 手写类型</span><span class="chip" data-page-node-id="zaI7xk3iIheWAAiNEFXxxR">分页/查询工具</span><span class="chip" data-page-node-id="wnsQxZUEzp8fJ0Wc5iPvdv">components/ui 通用 UI（无业务）</span></div></div>
+    <div class="arr" data-page-node-id="HYWn0BTs7fDFcWRbBVYAFu">▼ schema 唯一来源</div>
+    <div class="layer" data-page-node-id="f1rK78HFBEBoCtMOuEtYSJ"><div class="ln" data-page-node-id="rAitWx4p71rHowzEvwK2DW">⑤ 数据库 supabase/</div><div class="lb" data-page-node-id="CcUYU8k1MaiaH6H6QnGuIe">migrations/ SQL 迁移（001–010）· 表结构 / RLS 策略 / RBAC 角色权限 / 事务 RPC —— 全栈类型的唯一事实源</div></div>
+  </div>
+</div>
+
+<div style="margin-top:30px; color:var(--tx3); font-size:12px; text-align:center;" data-page-node-id="RrWcNbQrJ6pg6ZtKbQYKjf">引力治理体系中心 · 功能布局线框手册 · 生成于 2026-09-06</div>
+</div>
+</body>
+</html>

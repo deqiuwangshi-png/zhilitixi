@@ -5,17 +5,9 @@ import {
   userListQuerySchema,
   toUserListQuery,
   type UserItem,
+  type UserPageParams,
 } from '@/modules/users';
-import { UserManagementClient } from '@/components/features/users/user-management-client';
-
-export interface UserPageParams {
-  status?: string;
-  role?: string;
-  anomaly?: string;
-  q?: string;
-  page?: string;
-  size?: string;
-}
+import { UserManagementClient } from '@/modules/users/components/user-management-client';
 
 export const dynamic = 'force-dynamic';
 

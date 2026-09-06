@@ -5,7 +5,13 @@ import { getSupabasePrivilegedClient } from '@/storage/database/supabase-client'
 import { AuthError, AUTH_ERROR_CODES } from '@/lib/auth/errors';
 import { getRequestId } from '@/lib/request-context';
 import { requireUserBan, requireUserEdit } from './users.policy';
-import { editUserSchema, govActionSchema, type EditUserInput, type GovActionInput } from './users.schema';
+import {
+  editUserSchema,
+  govActionSchema,
+  verificationActionSchema,
+  type EditUserInput,
+  type GovActionInput,
+} from './users.schema';
 
 /**
  * RPC 幂等/审计键：显式传入优先，否则取请求上下文统一生成的 requestId
@@ -99,4 +105,23 @@ export async function updateUserProfile(input: EditUserInput): Promise<void> {
   // 原子化：资料列（name/points/badge）+ 可选角色调整在同一个 edit_user_profile_and_role
   // 事务 RPC 内完成，同成功/同失败，彻底消除“资料已改、角色未改”的部分成功。
   await editUserProfileAndRoleViaRpc(id, patch, role, ctx.userId);
+}
+
+/** 审核认证申请（approve→approved / reject→rejected）：user.edit + 校验 + 落库 */
+export async function applyVerification(id: string, action: 'approve' | 'reject'): Promise<void> {
+  const ctx = await requireUserEdit();
+  const parsed = verificationActionSchema.safeParse({ id, action });
+  if (!parsed.success) {
+    throw new AuthError(
+      AUTH_ERROR_CODES.VALIDATION_FAILED,
+      parsed.error.issues[0]?.message ?? '审核输入不合法'
+    );
+  }
+  const status = parsed.data.action === 'approve' ? 'approved' : 'rejected';
+  const { error } = await getSupabasePrivilegedClient().from('verifications').update({ status }).eq('id', parsed.data.id);
+  if (error) {
+    // 稳定文案对外；原始错误只落日志
+    console.error('[users] applyVerification failed:', error.message);
+    throw new AuthError(AUTH_ERROR_CODES.INTERNAL_ERROR, '审核操作失败，请稍后重试');
+  }
 }

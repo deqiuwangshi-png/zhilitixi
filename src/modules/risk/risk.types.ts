@@ -23,7 +23,7 @@ export interface RiskPageResult<T> {
   totalPages: number;
 }
 
-/** 顶部统计所需三数据源（与旧 risk-repo.RiskData 同形 + 分页态） */
+/** 顶部统计所需三数据源（+ domain 当页分页态） */
 export interface RiskListData {
   urlAudits: UrlAuditRow[];
   /** 全量域名（供顶部“黑名单域名”统计；与旧 RiskData 同构） */
@@ -35,3 +35,9 @@ export interface RiskListData {
   page: number;
   totalPages: number;
 }
+
+/** 顶部统计卡所需子集（RiskStats props；从 RiskListData 取基础四字段） */
+export type RiskData = Pick<
+  RiskListData,
+  'urlAudits' | 'domains' | 'uploadAudits' | 'userNames'
+>;

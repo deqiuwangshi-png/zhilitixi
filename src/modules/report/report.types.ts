@@ -78,3 +78,14 @@ export type ReportListRow = Pick<
   ReportsRow,
   'id' | 'reporter_id' | 'target_type' | 'target_id' | 'reason' | 'status' | 'created_at'
 >;
+
+/** 举报列表页 URL searchParams 形状（全部字符串，原样透传客户端 current） */
+export interface ReportPageParams {
+  status?: string;
+  type?: string;
+  reason?: string;
+  repeat?: string;
+  q?: string;
+  page?: string;
+  size?: string;
+}

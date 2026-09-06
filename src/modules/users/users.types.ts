@@ -1,6 +1,5 @@
 // 用户治理模块：领域类型定义。
-// 字段与前端 UserManagementClient / 各抽屉期望完全一致（与 user-repo 的
-// UserListItem / PenaltyRecord 同形，保持结构兼容，不改动任何组件）。
+// 字段与前端 UserManagementClient / 各抽屉 / AuthClient / AuthStats 期望完全一致。
 import type { UsersRow } from '@/lib/db-types';
 
 /** 治理状态（数据库多态状态收敛） */
@@ -84,4 +83,40 @@ export interface UserProfilePatch {
   name?: string;
   points?: number;
   badge?: string;
+}
+
+/** 用户管理页 URL searchParams（页面 + UserFilters 共享的筛选/分页参数） */
+export interface UserPageParams {
+  status?: string;
+  role?: string;
+  anomaly?: string;
+  q?: string;
+  page?: string;
+  size?: string;
+}
+
+// ---------- 认证申请审核（/user-auth，本域子业务） ----------
+
+/** 认证申请状态（verifications.status） */
+export type VerificationStatus = 'pending' | 'approved' | 'rejected';
+
+/** 认证申请列表行 DTO（/user-auth 消费） */
+export interface VerificationItem {
+  id: string;
+  userId: string | null;
+  vtype: string | null;
+  statement: string | null;
+  status: VerificationStatus;
+  createdAt: string | null;
+  userName: string;
+}
+
+/** 认证审核页聚合数据（统计全量走数据库 count，列表有界预览） */
+export interface AuthData {
+  verifications: VerificationItem[];
+  totalVerifications: number;
+  pendingCount: number;
+  approvedCount: number;
+  rejectedCount: number;
+  totalUsers: number;
 }

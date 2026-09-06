@@ -1,14 +1,16 @@
-// 内容审核模块：输入校验（zod）。
-// 复用既有 reviewActionSchema（写操作输入，保持单一来源），
-// 并新增 URL searchParams 列表校验 schema。
+// 内容审核模块：输入校验（zod 唯一来源，内联定义；覆盖写操作入参与 URL searchParams 列表校验）。
 import { z } from 'zod';
 import type { ReviewListQuery } from './content-review.types';
 
-// 复用既有写操作 schema（保持单一来源，避免重复定义）。
-export {
-  reviewActionSchema,
-  type ReviewActionInput,
-} from '@/lib/validations/review.schema';
+/** 审核动作入参（Server Actions 输入边界：来源 + id + 动作 + 驳回理由） */
+export const reviewActionSchema = z.object({
+  source: z.enum(['discovery', 'square', 'url'], '无效的内容来源'),
+  id: z.string().min(1, '缺少内容 id'),
+  action: z.enum(['approve', 'reject'], '无效的审核动作'),
+  reason: z.string().max(200).optional().default(''),
+});
+
+export type ReviewActionInput = z.infer<typeof reviewActionSchema>;
 
 /** 列表页 pageSize 白名单 */
 export const SIZES = [10, 20, 50, 100] as const;

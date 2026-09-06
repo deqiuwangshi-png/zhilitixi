@@ -1,6 +1,5 @@
 // 侵权与申诉模块：领域类型定义。
-// 字段与前端 AppealHeader / AppealClient 期望完全一致（与旧 appeal-repo 的
-// AppealItem 同形，保持结构兼容，不改动任何组件）。
+// 字段与前端 AppealHeader / AppealClient 期望完全一致（域内自包含，不依赖外部）。
 import type { AppealCatalogViewRow } from '@/lib/db-types';
 
 /** 申诉来源（discoveries / square_posts） */
@@ -9,7 +8,7 @@ export type AppealSource = 'discovery' | 'square';
 /** 申诉状态（目前无独立状态存储，全部为待复核） */
 export type AppealStatus = 'needs_review';
 
-/** 申诉案件行 DTO（与旧 appeal-repo.AppealItem 完全一致） */
+/** 申诉案件行 DTO */
 export interface AppealItem {
   source: AppealSource;
   id: string;

@@ -42,3 +42,13 @@ export interface ReviewPageResult<T> {
   pageSize: number;
   totalPages: number;
 }
+
+/** 内容审核页 URL searchParams 形状（全部字符串，原样透传客户端 current） */
+export interface ReviewPageParams {
+  status?: string;
+  type?: string;
+  category?: string;
+  q?: string;
+  page?: string;
+  size?: string;
+}

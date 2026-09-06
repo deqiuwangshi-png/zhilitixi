@@ -3,7 +3,17 @@
 import { getSessionRlsClient } from '@/lib/auth/session-client';
 import { rowToDto } from './users.mapper';
 import { DEFAULT_PAGE_SIZE, SIZES } from './users.schema';
-import type { UserItem, UserListQuery, UserPageResult, UserRowData } from './users.types';
+import type {
+  AuthData,
+  PenaltyAction,
+  PenaltyRecord,
+  UserItem,
+  UserListQuery,
+  UserPageResult,
+  UserRowData,
+  VerificationItem,
+  VerificationStatus,
+} from './users.types';
 
 /** listUsers 的 select 投影列（未含 is_admin） */
 const LIST_COLS =
@@ -57,7 +67,89 @@ export async function listUsers(query: UserListQuery): Promise<UserPageResult<Us
   };
 }
 
-// 处罚流水分组：单一来源 = src/lib/repos/user-repo（旧仓储层既有实现），消除本地重复实现；
-// 返回结构（PenaltyRecord，含 action/reason/operator/at）与 users.types.PenaltyRecord 结构同构，
-// 供列表详情抽屉消费。分页下沉见 user-repo 内 TODO。
-export { listPenaltiesGrouped } from '@/lib/repos/user-repo';
+/** 处罚流水，按 user_id 分组（供列表详情抽屉；Record 便于 RSC 序列化）。
+ * 有界预览语义：仅覆盖最近 500 条流水（列表抽屉的"最近处罚"展示），非全量；
+ * 全量/按用户分页统计以 users.penalty_count 为准。 */
+export async function listPenaltiesGrouped(): Promise<Record<string, PenaltyRecord[]>> {
+  const client = await getSessionRlsClient();
+  const { data, error } = await client
+    .from('governance_penalties')
+    .select('id,user_id,action,reason,operator_id,created_at')
+    .order('created_at', { ascending: false })
+    .limit(500);
+  if (error) throw new Error(`listPenalties failed: ${error.message}`);
+  const rows = data ?? [];
+
+  const operatorIds = Array.from(
+    new Set(rows.map((p) => p.operator_id).filter((x): x is string => !!x))
+  );
+  const names: Record<string, string> = {};
+  if (operatorIds.length) {
+    const { data: ops } = await client.from('users').select('id,name').in('id', operatorIds);
+    for (const o of ops ?? []) names[o.id] = o.name ?? '';
+  }
+
+  const map: Record<string, PenaltyRecord[]> = {};
+  for (const p of rows) {
+    const rec: PenaltyRecord = {
+      id: p.id,
+      action: p.action as PenaltyAction,
+      reason: p.reason ?? '',
+      operator: names[p.operator_id ?? ''] ?? '',
+      at: p.created_at ?? '',
+    };
+    (map[p.user_id] ??= []).push(rec);
+  }
+  return map;
+}
+
+/** 认证申请列表 + 状态统计（/user-auth 页；统计全量下沉数据库 count，列表保留有界预览） */
+export async function listAuthData(): Promise<AuthData> {
+  const client = await getSessionRlsClient();
+  const [
+    { data: verifications },
+    { count: total },
+    { count: pending },
+    { count: approved },
+    { count: totalUsers },
+  ] = await Promise.all([
+    client
+      .from('verifications')
+      .select('id,user_id,vtype,statement,status,created_at')
+      .order('created_at', { ascending: false })
+      .limit(200),
+    client.from('verifications').select('id', { count: 'exact', head: true }),
+    client.from('verifications').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+    client.from('verifications').select('id', { count: 'exact', head: true }).eq('status', 'approved'),
+    client.from('users').select('id', { count: 'exact', head: true }),
+  ]);
+  const rows = verifications ?? [];
+
+  // 联表用户名
+  const userIds = new Set<string>();
+  for (const v of rows) if (v.user_id) userIds.add(v.user_id);
+  const userNames: Record<string, string> = {};
+  if (userIds.size) {
+    const { data: users } = await client.from('users').select('id,name').in('id', Array.from(userIds));
+    for (const u of users ?? []) userNames[u.id] = u.name ?? '';
+  }
+
+  const items: VerificationItem[] = rows.map((v) => ({
+    id: v.id,
+    userId: v.user_id,
+    vtype: v.vtype,
+    statement: v.statement,
+    status: (v.status as VerificationStatus) || 'pending',
+    createdAt: v.created_at,
+    userName: userNames[v.user_id ?? ''] || '用户',
+  }));
+
+  return {
+    verifications: items,
+    totalVerifications: total ?? 0,
+    pendingCount: pending ?? 0,
+    approvedCount: approved ?? 0,
+    rejectedCount: (total ?? 0) - (pending ?? 0) - (approved ?? 0),
+    totalUsers: totalUsers ?? 0,
+  };
+}

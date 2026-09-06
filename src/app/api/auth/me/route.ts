@@ -1,20 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requirePermission } from '@/lib/auth/policy';
-import { Permissions } from '@/lib/auth/permissions';
 import { AUTH_ERROR_CODES, createApiError } from '@/lib/auth/errors';
 import { toErrorResponse } from '@/lib/auth/http';
 import { withRequestId } from '@/lib/request-context';
 import {
   getAdminProfileAndSessions,
   updateAdminProfile,
-} from '@/lib/repos/auth-session-repo';
-import { updateProfileSchema } from '@/lib/validations/auth-api.schema';
+  updateProfileSchema,
+  requireAuthAccess,
+} from '@/modules/auth';
 
-// GET /api/auth/me - 当前管理员聚合资料 + 会话列表（需登录 + is_admin）
+// GET /api/auth/me - 当前管理员聚合资料 + 会话列表（需登录管理员本人）
 export async function GET() {
   return withRequestId(async (requestId) => {
     try {
-      const admin = await requirePermission(Permissions.userRead);
+      const admin = await requireAuthAccess();
       const { user, sessions } = await getAdminProfileAndSessions({ userId: admin.userId });
       return NextResponse.json({ user, sessions, requestId });
     } catch (e) {
@@ -27,7 +26,7 @@ export async function GET() {
 export async function PUT(req: NextRequest) {
   return withRequestId(async (requestId) => {
     try {
-      const admin = await requirePermission(Permissions.userEdit);
+      const admin = await requireAuthAccess();
       const body = await req.json().catch(() => ({}));
       const parsed = updateProfileSchema.safeParse(body ?? {});
       if (!parsed.success) {

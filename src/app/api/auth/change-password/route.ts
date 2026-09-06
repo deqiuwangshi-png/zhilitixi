@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requirePermission } from '@/lib/auth/policy';
-import { Permissions } from '@/lib/auth/permissions';
 import { AUTH_ERROR_CODES, createApiError } from '@/lib/auth/errors';
 import { toErrorResponse } from '@/lib/auth/http';
 import { withRequestId } from '@/lib/request-context';
-import { changeAdminPassword } from '@/lib/repos/auth-session-repo';
-import { changePasswordSchema } from '@/lib/validations/auth-api.schema';
+import { changeAdminPassword, changePasswordSchema, requireAuthAccess } from '@/modules/auth';
 
 // POST /api/auth/change-password
 // body: { currentPassword, newPassword }
@@ -13,7 +10,7 @@ import { changePasswordSchema } from '@/lib/validations/auth-api.schema';
 export async function POST(req: NextRequest) {
   return withRequestId(async (requestId) => {
     try {
-      const admin = await requirePermission(Permissions.userEdit);
+      const admin = await requireAuthAccess();
       const body = await req.json().catch(() => ({}));
       const parsed = changePasswordSchema.safeParse(body ?? {});
       if (!parsed.success) {

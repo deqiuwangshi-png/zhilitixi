@@ -1,9 +1,9 @@
-// 用户治理模块：行归一化映射（从旧 user-repo 迁移，字段与 UserItem 完全一致）。
+// 用户治理模块：行归一化映射。
 import type { GovRole, GovStatus, UserItem, UserRowData } from './users.types';
 
 /**
  * 单个裸行 → UserItem DTO。
- * 与旧 user-repo.mapRow 逻辑一致：status 取 gov_status，role 受 badge 影响。
+ * 逻辑：status 取 gov_status，role 受 badge 影响。
  */
 export function rowToDto(u: UserRowData): UserItem {
   const hasBadge = !!u.badge && u.badge !== 'none' && u.badge !== '';

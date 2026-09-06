@@ -1,9 +1,9 @@
-// 侵权与申诉模块：行归一化映射（从旧 appeal-repo 迁移，字段与 AppealItem 完全一致）。
+// 侵权与申诉模块：行归一化映射。
 import type { AppealItem, AppealRowData, AppealSource } from './appeal.types';
 
 /**
  * 单个视图裸行 → AppealItem DTO。
- * 与旧 appeal-repo 逻辑一致：title/reason/content/note/description 按 src 取值，
+ * title/reason/content/note/description 按 src 取值，
  * authorName 由外部联表映射（queries 回查窗口内作者）。
  */
 export function rowToDto(r: AppealRowData, userNames: Record<string, string>): AppealItem {

@@ -8,9 +8,9 @@ import { ProfileDrawer } from '@/components/layout/profile-drawer';
 import { PasswordDrawer } from '@/components/layout/password-drawer';
 import { SettingsDrawer } from '@/components/layout/settings-drawer';
 import { loadPreferences, applyTheme, type CurrentUser, type PanelKey } from '@/components/layout/auth-types';
-import { logoutAction } from '@/lib/auth-actions';
-import type { NotificationItem } from '@/lib/repos/notification-repo';
-import { NotificationPanel } from '@/components/features/notifications/notification-panel';
+import { logoutAction } from '@/modules/auth/actions';
+import type { NotificationItem } from '@/modules/notification';
+import { NotificationPanel } from '@/modules/notification/components/notification-panel';
 
 const SITE_HOME_URL = process.env.NEXT_PUBLIC_SITE_HOME_URL || 'https://www.gravity-governance.cn';
 

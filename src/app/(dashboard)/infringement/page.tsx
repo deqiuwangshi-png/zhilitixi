@@ -1,7 +1,7 @@
 import { requireAppealRead, listAppeals } from '@/modules/appeal';
-import { AppealHeader } from '@/components/features/infringement/appeal-header';
-import { AppealTabs, type AppealTab } from '@/components/features/infringement/appeal-tabs';
-import { AppealClient } from '@/components/features/infringement/appeal-client';
+import { AppealHeader } from '@/modules/appeal/components/appeal-header';
+import { AppealTabs, type AppealTab } from '@/modules/appeal/components/appeal-tabs';
+import { AppealClient } from '@/modules/appeal/components/appeal-client';
 
 export const dynamic = 'force-dynamic';
 

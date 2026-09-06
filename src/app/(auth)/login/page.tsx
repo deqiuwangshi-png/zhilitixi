@@ -2,7 +2,8 @@
 
 import { useActionState } from 'react';
 import { ShieldCheck, Lock } from 'lucide-react';
-import { loginAction, type LoginState } from '@/lib/auth-actions';
+import { loginAction } from '@/modules/auth/actions';
+import type { LoginState } from '@/modules/auth';
 
 const initial: LoginState = { error: '', code: null };
 

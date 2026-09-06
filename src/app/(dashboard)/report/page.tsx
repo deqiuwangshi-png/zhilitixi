@@ -4,18 +4,9 @@ import {
   reportListQuerySchema,
   toReportListQuery,
   type ReportItem,
+  type ReportPageParams,
 } from '@/modules/report';
-import { ReportClient } from '@/components/features/report/report-client';
-
-export interface ReportPageParams {
-  status?: string;
-  type?: string;
-  reason?: string;
-  repeat?: string;
-  q?: string;
-  page?: string;
-  size?: string;
-}
+import { ReportClient } from '@/modules/report/components/report-client';
 
 export const dynamic = 'force-dynamic';
 

@@ -1,8 +1,8 @@
 import { requireAdmin } from '@/lib/auth';
-import { listAuthData } from '@/lib/repos/auth-repo';
-import { AuthStats } from '@/components/features/user-auth/auth-stats';
-import { AuthTabs, type AuthTab } from '@/components/features/user-auth/auth-tabs';
-import { AuthClient } from '@/components/features/user-auth/auth-client';
+import { listAuthData } from '@/modules/users';
+import { AuthStats } from '@/modules/users/components/auth-stats';
+import { AuthTabs, type AuthTab } from '@/modules/users/components/auth-tabs';
+import { AuthClient } from '@/modules/users/components/auth-client';
 
 export const dynamic = 'force-dynamic';
 

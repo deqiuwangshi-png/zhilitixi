@@ -1,16 +1,32 @@
-// 用户治理模块：输入校验（zod）。
-// 复用既有 govActionSchema / editUserSchema（写操作输入，保持单一来源），
-// 并新增 URL searchParams 列表校验 schema。
+// 用户治理模块：输入校验（zod，域内唯一定义处）。
+// 治理/编辑/认证审核写操作 schema + URL searchParams 列表校验。
 import { z } from 'zod';
 import type { UserListQuery } from './users.types';
 
-// 复用既有写操作 schema（保持单一来源，避免重复定义）。
-export {
-  govActionSchema,
-  editUserSchema,
-  type GovActionInput,
-  type EditUserInput,
-} from '@/lib/validations/user.schema';
+/** 治理动作（ban/unban/limit/unlimit/normal）：user.ban + 事务 RPC 入参 */
+export const govActionSchema = z.object({
+  id: z.string().min(1, '缺少用户 id'),
+  action: z.enum(['ban', 'unban', 'limit', 'unlimit', 'normal'], '无效的治理动作'),
+  reason: z.string().max(200).optional().default(''),
+});
+export type GovActionInput = z.infer<typeof govActionSchema>;
+
+/** 编辑基础资料（昵称/积分/徽章，可含角色调整）：user.edit + 事务 RPC 入参 */
+export const editUserSchema = z.object({
+  id: z.string().min(1, '缺少用户 id'),
+  name: z.string().trim().min(1, '昵称不能为空').max(30, '昵称过长').optional(),
+  points: z.number().int('积分为整数').min(-100000).max(100000).optional(),
+  badge: z.string().max(30, '徽章过长').optional(),
+  role: z.enum(['user', 'moderator']).optional(),
+});
+export type EditUserInput = z.infer<typeof editUserSchema>;
+
+/** 认证审核动作（approve/reject）：写 verifications.status */
+export const verificationActionSchema = z.object({
+  id: z.string().min(1, '缺少申请 id'),
+  action: z.enum(['approve', 'reject'], '无效的审核动作'),
+});
+export type VerificationActionInput = z.infer<typeof verificationActionSchema>;
 
 /** 列表页 pageSize 白名单 */
 export const SIZES = [10, 20, 50, 100] as const;

@@ -1,13 +1,30 @@
-// 风控中心模块：输入校验（zod）。
-// 复用既有写操作 schema（risk.schema.ts），并新增 URL searchParams 列表校验 schema。
+// 风控中心模块：输入校验（zod，域内唯一定义处）。
 import { z } from 'zod';
 import type { RiskListQuery } from './risk.types';
 
-// 复用既有写操作 schema（保持单一来源，避免重复定义）。
-export {
-  riskActionSchema,
-  type RiskActionInput,
-} from '@/lib/validations/risk.schema';
+/** 风控操作输入（写操作边界）：域名增删/切换、URL 放行封禁删除、上传审核 */
+export const riskActionSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('domain'),
+    action: z.enum(['upsert', 'delete'], '无效的动作'),
+    domain: z.string().trim().min(1, '域名必填').max(253),
+    kind: z.enum(['trusted', 'blocked']).optional(),
+    note: z.string().max(200).optional(),
+  }),
+  z.object({
+    type: z.literal('url'),
+    action: z.enum(['approve', 'reject', 'delete'], '无效的动作'),
+    id: z.union([z.string(), z.number()]),
+    risk: z.enum(['safe', 'high']).optional(),
+  }),
+  z.object({
+    type: z.literal('upload'),
+    action: z.enum(['approve', 'reject'], '无效的动作'),
+    id: z.union([z.string(), z.number()]),
+  }),
+]);
+
+export type RiskActionInput = z.infer<typeof riskActionSchema>;
 
 /** 列表页 pageSize 白名单 */
 export const SIZES = [10, 20, 50, 100] as const;

@@ -1,9 +1,9 @@
-// 商品治理模块：行归一化映射（从旧 product-repo 迁移，字段与 ProductItem 完全一致）。
+// 商品治理模块：行归一化映射。
 import type { DiscoveryRowData, ProductItem, SquareRowData } from './product-gov.types';
 
 /**
  * discovery 裸行 → ProductItem DTO。
- * 与旧 product-repo 的商业化内容映射逻辑一致：status 取 reason 是否为空。
+ * status 取 reason 是否为空（discovery 语义）。
  */
 export function discoveryToDto(d: DiscoveryRowData, names: Record<string, string>): ProductItem {
   return {
@@ -24,7 +24,7 @@ export function discoveryToDto(d: DiscoveryRowData, names: Record<string, string
 
 /**
  * square_posts 裸行 → ProductItem DTO。
- * 与旧 product-repo 的链接帖子映射逻辑一致：status 取 url_status 是否 blocked。
+ * status 取 url_status 是否 blocked（square 语义）。
  */
 export function squareToDto(p: SquareRowData, names: Record<string, string>): ProductItem {
   return {

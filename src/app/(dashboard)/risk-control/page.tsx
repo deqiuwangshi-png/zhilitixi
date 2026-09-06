@@ -1,7 +1,7 @@
 import { requireRiskRead, listRiskData, type RiskListQuery } from '@/modules/risk';
-import { RiskStats } from '@/components/features/risk-control/risk-stats';
-import { RiskTabs, type RiskTab } from '@/components/features/risk-control/risk-tabs';
-import { RiskClient } from '@/components/features/risk-control/risk-client';
+import { RiskStats } from '@/modules/risk/components/risk-stats';
+import { RiskTabs, type RiskTab } from '@/modules/risk/components/risk-tabs';
+import { RiskClient } from '@/modules/risk/components/risk-client';
 
 export interface RiskPageParams {
   tab?: string;

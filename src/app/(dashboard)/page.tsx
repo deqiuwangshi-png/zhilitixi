@@ -1,9 +1,9 @@
 import { requireOverviewRead, getOverviewData, toOverviewRange } from '@/modules/overview';
-import { StatCards } from '@/components/features/overview/stat-cards';
-import { TrendPanel } from '@/components/features/overview/trend-panel';
-import { PenaltyDist } from '@/components/features/overview/penalty-dist';
-import { TopReports } from '@/components/features/overview/top-reports';
-import { RiskUsers } from '@/components/features/overview/risk-users';
+import { StatCards } from '@/modules/overview/components/stat-cards';
+import { TrendPanel } from '@/modules/overview/components/trend-panel';
+import { PenaltyDist } from '@/modules/overview/components/penalty-dist';
+import { TopReports } from '@/modules/overview/components/top-reports';
+import { RiskUsers } from '@/modules/overview/components/risk-users';
 
 export const dynamic = 'force-dynamic';
 

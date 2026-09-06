@@ -1,15 +1,29 @@
-// 商品治理模块：输入校验（zod）。
-// 复用既有写操作 schema（product.schema.ts），并新增 URL searchParams 列表校验 schema。
+// 商品治理模块：输入校验（zod，域内唯一定义处）。
+// 含写操作 schema 与 URL searchParams 列表校验。
 import { z } from 'zod';
 import type { ProductListQuery } from './product-gov.types';
 
-// 复用既有写操作 schema（保持单一来源，避免重复定义）。
-export {
-  productEditSchema,
-  productDeleteSchema,
-  type ProductEditInput,
-  type ProductDeleteInput,
-} from '@/lib/validations/product.schema';
+/** 编辑商品（编辑 / 上架 / 下架） */
+export const productEditSchema = z.object({
+  source: z.enum(['discovery', 'square'], '无效的来源'),
+  id: z.string().min(1, '缺少商品 id'),
+  title: z.string().trim().min(1, '标题为必填项').max(100, '标题过长'),
+  kind: z.string().max(50).optional().default(''),
+  commission: z.union([z.string(), z.number(), z.null()]).optional(),
+  promoType: z.string().max(50).optional().default(''),
+  url: z.string().max(500).optional().default(''),
+  commercial: z.boolean().optional(),
+  status: z.enum(['上架', '下架'], '无效的状态'),
+});
+
+/** 删除商品（真删主库对应行） */
+export const productDeleteSchema = z.object({
+  source: z.enum(['discovery', 'square'], '无效的来源'),
+  id: z.string().min(1, '缺少商品 id'),
+});
+
+export type ProductEditInput = z.infer<typeof productEditSchema>;
+export type ProductDeleteInput = z.infer<typeof productDeleteSchema>;
 
 /** 列表页 pageSize 白名单 */
 export const SIZES = [10, 20, 50, 100] as const;

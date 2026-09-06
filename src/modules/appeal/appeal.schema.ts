@@ -1,13 +1,15 @@
-// 侵权与申诉模块：输入校验（zod）。
-// 复用既有写操作 schema（appeal.schema.ts），并新增 URL searchParams 列表校验 schema。
+// 侵权与申诉模块：输入校验（zod，域内唯一定义处）。
 import { z } from 'zod';
 import type { AppealListQuery } from './appeal.types';
 
-// 复用既有写操作 schema（保持单一来源，避免重复定义）。
-export {
-  appealActionSchema,
-  type AppealActionInput,
-} from '@/lib/validations/appeal.schema';
+/** 申诉处理输入（写操作边界）：restore 恢复发布 / dismiss 维持处罚 */
+export const appealActionSchema = z.object({
+  source: z.enum(['discovery', 'square'], '无效的来源'),
+  id: z.string().min(1, '缺少案件 id'),
+  action: z.enum(['restore', 'dismiss'], '无效的处理动作'),
+});
+
+export type AppealActionInput = z.infer<typeof appealActionSchema>;
 
 /** 列表页 pageSize 白名单 */
 export const SIZES = [10, 20, 50, 100] as const;

@@ -1,10 +1,14 @@
-// 举报处理模块：输入校验（zod）。
-// 复用既有 reportActionSchema（写操作输入），并新增 URL searchParams 列表校验 schema。
+// 举报处理模块：输入校验（zod 唯一来源，内联定义；覆盖写操作入参与 URL searchParams 列表校验）。
 import { z } from 'zod';
 import type { ReportListQuery } from './report.types';
 
-// 复用既有写操作 schema（保持单一来源，避免重复定义）。
-export { reportActionSchema, type ReportActionInput } from '@/lib/validations/report.schema';
+/** 举报处理动作入参（Server Actions 输入边界） */
+export const reportActionSchema = z.object({
+  id: z.string().min(1, '缺少举报 id'),
+  action: z.enum(['approve', 'reject'], '无效的处理动作'),
+});
+
+export type ReportActionInput = z.infer<typeof reportActionSchema>;
 
 /** 列表页 pageSize 白名单 */
 export const SIZES = [10, 20, 50, 100] as const;

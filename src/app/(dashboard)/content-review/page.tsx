@@ -5,18 +5,10 @@ import {
   reviewListQuerySchema,
   toReviewListQuery,
   type ReviewItem,
+  type ReviewPageParams,
 } from '@/modules/content-review';
-import { ReviewFilters } from '@/components/features/review/review-filters';
-import { ReviewTable } from '@/components/features/review/review-table';
-
-export interface ReviewPageParams {
-  status?: string;
-  type?: string;
-  category?: string;
-  q?: string;
-  page?: string;
-  size?: string;
-}
+import { ReviewFilters } from '@/modules/content-review/components/review-filters';
+import { ReviewTable } from '@/modules/content-review/components/review-table';
 
 export const dynamic = 'force-dynamic';
 

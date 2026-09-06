@@ -1,6 +1,5 @@
 // 商品治理模块：领域类型定义。
-// 字段与前端 ProductClient / ProductTable / ProductEditDrawer / ProductStats 期望完全一致
-//（与旧 product-repo 的 ProductItem / ProductStats 同形，保持结构兼容，不改动任何组件）。
+// 字段与前端 ProductClient / ProductTable / ProductEditDrawer / ProductStats 期望完全一致。
 import type { DiscoveriesRow, SquarePostsRow } from '@/lib/db-types';
 
 /** 商品数据来源（discoveries / square_posts） */
@@ -9,7 +8,7 @@ export type ProductSource = 'discovery' | 'square';
 /** 商品状态（由 reason / url_status 收敛） */
 export type ProductStatus = '上架' | '下架';
 
-/** 商品列表行 DTO（与旧 product-repo.ProductItem 完全一致） */
+/** 商品列表行 DTO */
 export interface ProductItem {
   source: ProductSource;
   id: string;
@@ -43,7 +42,7 @@ export interface ProductPageResult<T> {
   totalPages: number;
 }
 
-/** 顶部统计卡数据（与旧 product-repo.ProductStats 完全一致） */
+/** 顶部统计卡数据 */
 export interface ProductStats {
   total: number;
   commercial: number;
@@ -73,3 +72,11 @@ export type SquareRowData = Pick<
   SquarePostsRow,
   'id' | 'author_id' | 'content' | 'category' | 'url' | 'url_status' | 'created_at'
 >;
+
+/** 商品列表页 URL searchParams 形状（页面与筛选/客户端组件共用） */
+export interface ProductPageParams {
+  type?: string;
+  status?: string;
+  q?: string;
+  page?: string;
+}

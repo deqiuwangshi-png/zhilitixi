@@ -5,16 +5,10 @@ import {
   productListQuerySchema,
   toProductListQuery,
   type ProductItem,
+  type ProductPageParams,
 } from '@/modules/product-gov';
-import { ProductStats } from '@/components/features/product-gov/product-stats';
-import { ProductClient } from '@/components/features/product-gov/product-client';
-
-export interface ProductPageParams {
-  type?: string;
-  status?: string;
-  q?: string;
-  page?: string;
-}
+import { ProductStats } from '@/modules/product-gov/components/product-stats';
+import { ProductClient } from '@/modules/product-gov/components/product-client';
 
 export const dynamic = 'force-dynamic';
 

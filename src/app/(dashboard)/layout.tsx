@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { DashboardHeader } from '@/components/layout/dashboard-header';
 import { requireAdmin } from '@/lib/auth';
-import { listNotifications } from '@/lib/repos/notification-repo';
+import { listNotifications } from '@/modules/notification';
 
 export const metadata: Metadata = {
   title: '引力治理体系中心',
