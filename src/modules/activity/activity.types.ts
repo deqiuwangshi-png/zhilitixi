@@ -47,3 +47,10 @@ export interface ActivityStatsData {
   total: number;
   active: number;
 }
+
+/** 活动列表页 URL searchParams 形状（页面与筛选组件共用，原定义在页面内造成组件反向依赖页面） */
+export interface ActivityPageParams {
+  kind?: string;
+  q?: string;
+  page?: string;
+}

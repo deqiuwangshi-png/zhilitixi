@@ -1,4 +1,4 @@
-import type { ActivityStatsData } from '@/modules/activity';
+import type { ActivityStatsData } from '../activity.types';
 
 /** 顶部 3 项统计卡（服务端计算，数据库全量 count） */
 export function ActivityStats({ data }: { data: ActivityStatsData }) {

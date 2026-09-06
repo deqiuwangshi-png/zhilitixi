@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Pencil, Trash2, Inbox, ChevronLeft, ChevronRight } from 'lucide-react';
-import type { ActivityItem } from '@/lib/repos/activity-repo';
-import { toggleActivityAction, removeActivityAction } from '@/lib/actions/activity-actions';
+import type { ActivityItem } from '../activity.types';
+import { toggleActivityAction, removeActivityAction } from '../actions';
 
 const kindLabel: Record<string, string> = {
   activity: '活动',

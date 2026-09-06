@@ -1,9 +1,11 @@
-// 活动上架 Server Actions（'use server' 文件）
+// 活动上架模块：Server Actions（唯一写入口）。
+// 注意：'use server' 文件只能导出 async 函数，类型定义必须放在 activity.types / activity.schema。
 'use server';
 
 import { revalidatePath } from 'next/cache';
 import { withRequestId } from '@/lib/request-context';
-import { saveActivity, toggleActivity, removeActivity, type ActivitySaveInput } from '@/modules/activity';
+import { saveActivity, toggleActivity, removeActivity } from './activity.commands';
+import type { ActivitySaveInput } from './activity.schema';
 
 export interface ActionResult {
   ok: boolean;

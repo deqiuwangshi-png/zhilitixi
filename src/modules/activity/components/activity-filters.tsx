@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Search, Plus } from 'lucide-react';
-import type { ActivityPageParams } from '@/app/(dashboard)/activity/page';
+import type { ActivityPageParams } from '../activity.types';
 
 const selectCls =
   'h-9 rounded-md border border-[#E5E6EB] bg-white px-3 text-[13px] text-[#1F2329] outline-none transition-colors focus:border-[#006855]';

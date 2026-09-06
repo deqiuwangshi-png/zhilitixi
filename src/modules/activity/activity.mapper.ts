@@ -1,4 +1,4 @@
-// 活动上架模块：行归一化映射（从旧 activity-repo 迁移，字段与 ActivityItem / AnnouncementsRow 完全一致）。
+// 活动上架模块：行归一化映射（字段与 ActivityItem / AnnouncementsRow 完全一致）。
 import type { ActivityItem, ActivityRowData } from './activity.types';
 
 /** 单个裸行 → ActivityItem DTO（空值收敛为默认值，保持前端组件期望的结构） */

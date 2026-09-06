@@ -1,4 +1,4 @@
-import type { RuleData } from '@/lib/repos/rule-repo';
+import type { RuleData } from '../rules.types';
 
 /** 违规处罚记录（服务端直查展示） */
 export function ViolationsList({ data }: { data: RuleData }) {

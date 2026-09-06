@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import type { ActivityItem } from '@/lib/repos/activity-repo';
-import type { ActivityPageParams } from '@/app/(dashboard)/activity/page';
+import type { ActivityItem } from '../activity.types';
+import type { ActivityPageParams } from '../activity.types';
 import { ActivityFilters } from './activity-filters';
 import { ActivityTable } from './activity-table';
 import { ActivityDrawer } from './activity-drawer';

@@ -1,6 +1,6 @@
 import { requireRuleManage, listRules } from '@/modules/rules';
-import { DomainManager } from '@/components/features/rules/domain-manager';
-import { ViolationsList } from '@/components/features/rules/violations-list';
+import { DomainManager } from '@/modules/rules/components/domain-manager';
+import { ViolationsList } from '@/modules/rules/components/violations-list';
 
 export const dynamic = 'force-dynamic';
 

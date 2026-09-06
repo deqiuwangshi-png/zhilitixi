@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, Shield, Trash2 } from 'lucide-react';
 import type { LinkDomainsRow } from '@/lib/db-types';
-import { handleRuleAction } from '@/lib/actions/rule-actions';
+import { handleRuleAction } from '../actions';
 
 /** 域名规则管理（输入框 + 加名单 + 列表切换/删除，操作走 Server Action） */
 export function DomainManager({ domains }: { domains: LinkDomainsRow[] }) {

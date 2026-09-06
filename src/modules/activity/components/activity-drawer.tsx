@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { X, Sparkles } from 'lucide-react';
-import type { ActivityItem } from '@/lib/repos/activity-repo';
-import { saveActivityAction } from '@/lib/actions/activity-actions';
+import type { ActivityItem } from '../activity.types';
+import { saveActivityAction } from '../actions';
 
 const kindLabel: Record<string, string> = {
   activity: '活动',

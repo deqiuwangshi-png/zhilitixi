@@ -1,4 +1,4 @@
-// 举报处理模块：行归一化映射（从旧 report-repo 迁移，字段与 ReportItem 完全一致）。
+// 举报处理模块：行归一化映射（字段与 ReportItem 完全一致）。
 import type {
   ContentTypeFn,
   ReasonFn,

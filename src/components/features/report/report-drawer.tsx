@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import type { ReportItem } from '@/lib/repos/report-repo';
+import type { ReportItem } from '@/modules/report';
 import { handleReport } from '@/lib/actions/report-actions';
 
 const statusMeta: Record<string, { label: string; cls: string }> = {

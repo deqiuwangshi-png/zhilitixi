@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { ReportItem } from '@/lib/repos/report-repo';
+import type { ReportItem } from '@/modules/report';
 import type { ReportPageParams } from '@/app/(dashboard)/report/page';
 import { ReportFilters } from './report-filters';
 import { ReportTable } from './report-table';

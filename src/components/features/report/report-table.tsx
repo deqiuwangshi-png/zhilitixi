@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { Inbox, ChevronLeft, ChevronRight } from 'lucide-react';
-import type { ReportItem } from '@/lib/repos/report-repo';
+import type { ReportItem } from '@/modules/report';
 
 const statusMeta: Record<string, { label: string; cls: string }> = {
   pending: { label: '待处理', cls: 'bg-[#FFF4E6] text-[#FF8800]' },

@@ -5,15 +5,10 @@ import {
   activityListQuerySchema,
   toActivityListQuery,
   type ActivityItem,
+  type ActivityPageParams,
 } from '@/modules/activity';
-import { ActivityStats } from '@/components/features/activity/activity-stats';
-import { ActivityClient } from '@/components/features/activity/activity-client';
-
-export interface ActivityPageParams {
-  kind?: string;
-  q?: string;
-  page?: string;
-}
+import { ActivityStats } from '@/modules/activity/components/activity-stats';
+import { ActivityClient } from '@/modules/activity/components/activity-client';
 
 export const dynamic = 'force-dynamic';
 
